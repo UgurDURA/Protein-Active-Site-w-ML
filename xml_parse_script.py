@@ -2,7 +2,7 @@ import os
 import xml.etree.ElementTree as etree
 
 file_name = 'ExampleDATA.xml'
-full_file = os.path.abspath(os.path.join('data', file_name))
+full_file = os.path.abspath(os.path.join(file_name))
 
 dom = etree.parse(full_file)
 
