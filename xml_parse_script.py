@@ -1,14 +1,16 @@
+'''
+TODO:
+> convert and move to python3
+>
+
+'''
+
 import os
 import xml.etree.ElementTree as etree
 
 file_name = 'ExampleDATA.xml'
 full_file = os.path.abspath(os.path.join(file_name))
 
-'''
-dom = etree.parse(full_file)
-
-root = dom.getroot()
-'''
 
 def get_string_or_none(element_list, delimiter):
     list_text = ''
