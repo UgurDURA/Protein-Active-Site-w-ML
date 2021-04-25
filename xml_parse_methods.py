@@ -1,8 +1,18 @@
+'''
+TODO:
+> edit process entry to add relevant attributes to a container
+> fix 'inputhook' issue ??
+
+> pyTorch Transformer Model
+'''
+
+
 import os
 import xml.etree.ElementTree as etree
 
 file_name = 'ExampleDATA.xml'
 full_file = os.path.abspath(os.path.join(file_name))
+
 
 def get_string_or_none(element_list, delimiter):
     list_text = ''
@@ -60,16 +70,13 @@ def process_entry(entry, ns):
         full_name_string = full_name.text
         ec_numbers_string = get_string_or_none(ec_numbers, '#')
         rhea_ids_string = list_to_str(rhea_ids, '#')
-    #    print(
-    #        accesion_string + ', ' + full_name_string + ', ' + ec_numbers_string + ', ' + rhea_ids_string + ', ' + features_string + ', ' + sequence_length + ', ' + sequence_string)
+        #    print(
+        #        accesion_string + ', ' + full_name_string + ', ' + ec_numbers_string + ', ' + rhea_ids_string + ', ' + features_string + ', ' + sequence_length + ', ' + sequence_string)
 
         print(accesion_string + ', ' + ec_numbers_string + ', ' + sequence_length)
         print(sequence_string)
-
-
     except Exception as e:
         print(e)
-
 
 
 def fixtag(ns, tag, nsmap):
