@@ -1,9 +1,15 @@
 '''
 TODO:
 > edit process entry to add relevant attributes to a container
->
 
-> pyTorch Transformer Model
+> keras Transformer Model:
+    - preprocess
+    - embedding
+    - pos embedding
+    - encoder & decoder
+     - self-attention, masking,feedforward
+    - output formatting
+
 '''
 
 
