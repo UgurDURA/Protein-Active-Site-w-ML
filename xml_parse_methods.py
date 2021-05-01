@@ -1,7 +1,7 @@
 '''
 TODO:
 > edit process entry to add relevant attributes to a container
-> fix 'inputhook' issue ??
+>
 
 > pyTorch Transformer Model
 '''
@@ -82,14 +82,17 @@ def process_entry(entry, ns):
 def fixtag(ns, tag, nsmap):
     return '{' + nsmap[ns] + '}' + tag
 
-
+'''
 nsmap = {}
 for event, elem in etree.iterparse(full_file, events=('start-ns',)):
     ns, url = elem
     nsmap[ns] = url
+    print('a')
 
 for event, elem in etree.iterparse(full_file, events=('end', 'start')):
     if event == 'end':
         if elem.tag == fixtag('', 'entry', nsmap):
             process_entry(elem, nsmap)
             elem.clear()
+            print('b')
+'''
