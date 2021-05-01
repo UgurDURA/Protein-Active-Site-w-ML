@@ -9,11 +9,19 @@ import xml_parse_methods
 import os
 import xml.etree.ElementTree as ET
 
-file_name = 'ExampleDATA.xml'
+file_name = 'uniprot.xml'
 full_file = os.path.abspath(os.path.join(file_name))
 
+nsmap = {}
+for event, elem in ET.iterparse(full_file, events=('start', 'end', 'start-ns', 'end-ns')):
+    if event == 'start-ns':
+        ns, url = elem
+        nsmap[ns] = url
 
-def main():
+    if event == 'end':
+        if elem.tag == xml_parse_methods.fixtag('', 'entry', nsmap):
+            xml_parse_methods.process_entry(elem, nsmap)
+            elem.clear()
 
 
-    print('That\'s all folks!')
+print('That\'s all folks!')
