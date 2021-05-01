@@ -42,34 +42,34 @@ def process_entry(entry, ns):
         recommended_name = protein.find('{' + ns[''] + '}' + 'recommendedName')
         full_name = recommended_name.find('{' + ns[''] + '}' + 'fullName')
         ec_numbers = recommended_name.findall('{' + ns[''] + '}' + 'ecNumber')
-        rhea_ids = []
-        for comment in entry.findall('{' + ns[''] + '}' + 'comment'):
-            try:
-                if comment.attrib['type'] == 'catalytic activity':
-                    reactions = comment.findall('{' + ns[''] + '}' + 'reaction')
-                    for reaction in reactions:
-                        for db_reference in reaction.findall('{' + ns[''] + '}' + 'dbReference'):
-                            if db_reference.attrib['type'] == 'Rhea':
-                                rhea_ids.append(db_reference.attrib['id'])
-            except AttributeError as e:
-                print('Exception in reactions' + str(e))
-        features = entry.findall('{' + ns[''] + '}' + 'feature')
-        feature_list = []
-        for feature in features:
-            location = feature.find('{' + ns[''] + '}' + 'location')
-            position = location.find('{' + ns[''] + '}' + 'position')
-            if position is not None and len(feature.attrib['description']) < 40:
-                feature_str = feature.attrib['type'] + ',' + feature.attrib['description'] + ',' + position.attrib[
-                    'position']
-                feature_list.append(feature_str)
-        features_string = list_to_str(feature_list, '#')
+        # rhea_ids = []
+        # for comment in entry.findall('{' + ns[''] + '}' + 'comment'):
+        #     try:
+        #         if comment.attrib['type'] == 'catalytic activity':
+        #             reactions = comment.findall('{' + ns[''] + '}' + 'reaction')
+        #             for reaction in reactions:
+        #                 for db_reference in reaction.findall('{' + ns[''] + '}' + 'dbReference'):
+        #                     if db_reference.attrib['type'] == 'Rhea':
+        #                         rhea_ids.append(db_reference.attrib['id'])
+        #     except AttributeError as e:
+        #         print('Exception in reactions' + str(e))
+        # features = entry.findall('{' + ns[''] + '}' + 'feature')
+        # feature_list = []
+        # for feature in features:
+        #     location = feature.find('{' + ns[''] + '}' + 'location')
+        #     position = location.find('{' + ns[''] + '}' + 'position')
+        #     if position is not None and len(feature.attrib['description']) < 40:
+        #         feature_str = feature.attrib['type'] + ',' + feature.attrib['description'] + ',' + position.attrib[
+        #             'position']
+        #         feature_list.append(feature_str)
+        # features_string = list_to_str(feature_list, '#')
         sequence = entry.find('{' + ns[''] + '}' + 'sequence')
         sequence_length = sequence.attrib['length']
         sequence_string = sequence.text
         accesion_string = accession.text
         full_name_string = full_name.text
         ec_numbers_string = get_string_or_none(ec_numbers, '#')
-        rhea_ids_string = list_to_str(rhea_ids, '#')
+        #rhea_ids_string = list_to_str(rhea_ids, '#')
         #    print(
         #        accesion_string + ', ' + full_name_string + ', ' + ec_numbers_string + ', ' + rhea_ids_string + ', ' + features_string + ', ' + sequence_length + ', ' + sequence_string)
 
