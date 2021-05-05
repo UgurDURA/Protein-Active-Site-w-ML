@@ -9,7 +9,7 @@ import xml_parse_methods
 import os
 import xml.etree.ElementTree as ET
 
-file_name = 'uniprot.xml'
+file_name = 'ExampleDATA.xml'
 full_file = os.path.abspath(os.path.join(file_name))
 
 nsmap = {}
