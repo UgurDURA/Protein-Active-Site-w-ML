@@ -8,15 +8,16 @@ TODO:
     - embedding
     - pos embedding
     - encoder & decoder
-        > self-attention, masking,feedforward
+        > self-attention, masking, feedforward
     - output formatting
     - train and evaluate
+
+> parse and train in batches?
 
 '''
 
 
 import os
-import xml.etree.ElementTree as etree
 
 file_name = 'ExampleDATA.xml'
 full_file = os.path.abspath(os.path.join(file_name))
