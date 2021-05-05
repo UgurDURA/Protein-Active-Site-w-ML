@@ -1,14 +1,16 @@
 '''
 TODO:
-> edit process entry to add relevant attributes to a container
+> fix process_entry() to pick only the first EC number.
 
 > keras Transformer Model:
     - preprocess
+        > divide into training/validation
     - embedding
     - pos embedding
     - encoder & decoder
-     - self-attention, masking,feedforward
+        > self-attention, masking,feedforward
     - output formatting
+    - train and evaluate
 
 '''
 
@@ -40,7 +42,7 @@ def list_to_str(string_list, delimiter):
     return joined_string
 
 
-def process_entry(entry, ns):
+def process_entry(entry, ns, data):
     try:
         accession = entry.find('{' + ns[''] + '}' + 'accession')
         protein = entry.find('{' + ns[''] + '}' + 'protein')
@@ -49,11 +51,17 @@ def process_entry(entry, ns):
         sequence = entry.find('{' + ns[''] + '}' + 'sequence')
         sequence_length = sequence.attrib['length']
         sequence_string = sequence.text
-        accesion_string = accession.text
+        accession_string = accession.text
         ec_numbers_string = get_string_or_none(ec_numbers, '#')
 
-        print(accesion_string + ', ' + ec_numbers_string + ', ' + sequence_length)
+        '''
+        print(accession_string + ', ' + ec_numbers_string + ', ' + sequence_length)
         print(sequence_string)
+        '''
+
+        entry_n = (accession_string, ec_numbers_string, sequence_length, sequence_string)
+        data += entry_n
+
     except Exception as e:
         print(e)
 
