@@ -11,7 +11,7 @@ import xml.etree.ElementTree as ET
 # keras model configuration
 
 
-file_name = 'ExampleDATA.xml'
+file_name = 'uniprot-ec__+AND+reviewed_yes.xml'
 full_file = os.path.abspath(os.path.join(file_name))
 
 nsmap = {}

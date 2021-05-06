@@ -46,13 +46,19 @@ def process_entry(entry, ns):
         accession = entry.find('{' + ns[''] + '}' + 'accession')
         protein = entry.find('{' + ns[''] + '}' + 'protein')
         recommended_name = protein.find('{' + ns[''] + '}' + 'recommendedName')
-        ec_number = recommended_name.find('{' + ns[''] + '}' + 'ecNumber')
+        alternative_name = protein.findall('{' + ns[''] + '}' + 'alternativeName')
+        if recommended_name.find('{' + ns[''] + '}' + 'ecNumber') is not None:
+            ec_number = recommended_name.find('{' + ns[''] + '}' + 'ecNumber')
+        else:
+            for n in alternative_name:
+                if n.find('{' + ns[''] + '}' + 'ecNumber') is not None:
+                    ec_number = n.find('{' + ns[''] + '}' + 'ecNumber')
+                    break
         sequence = entry.find('{' + ns[''] + '}' + 'sequence')
         sequence_length = sequence.attrib['length']
         sequence_string = sequence.text
         accession_string = accession.text
         ec_number_string = ec_number.text
-
 
         print(accession_string + ', ' + ec_number_string + ', ' + sequence_length)
         print(sequence_string)
