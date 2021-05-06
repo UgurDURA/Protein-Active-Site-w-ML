@@ -1,5 +1,6 @@
 '''
 TODO:
+
 > keras Transformer Model:
     - preprocess
         > divide into training/validation
@@ -13,12 +14,6 @@ TODO:
 > parse and train in batches?
 
 '''
-
-
-import os
-
-file_name = 'ExampleDATA.xml'
-full_file = os.path.abspath(os.path.join(file_name))
 
 #
 # def get_string_or_none(element_list, delimiter):
@@ -54,8 +49,10 @@ def process_entry(entry, ns):
         ec_number_string = ec_number.text
 
 
-        print(accession_string + ', ' + ec_number_string + ', ' + sequence_length)
-        print(sequence_string)
+        entry_n = (accession_string, ec_number_string, sequence_length, sequence_string)
+        print(entry_n)
+
+        return entry_n
 
 
     except Exception as e:
