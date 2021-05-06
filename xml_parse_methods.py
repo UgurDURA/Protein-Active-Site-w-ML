@@ -60,6 +60,7 @@ def process_entry(entry, ns):
         accession_string = accession.text
         ec_number_string = ec_number.text
 
+
         print(accession_string + ', ' + ec_number_string + ', ' + sequence_length)
         print(sequence_string)
 
