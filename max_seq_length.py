@@ -21,7 +21,7 @@ file_name = 'uniprot.xml'
 full_file = os.path.abspath(os.path.join(file_name))
 
 nsmap = {}
-max_seq = 0
+seq_counter = 0
 for event, elem in ET.iterparse(full_file, events=('start', 'end', 'start-ns', 'end-ns')):
     if event == 'start-ns':
         ns, url = elem
@@ -30,19 +30,14 @@ for event, elem in ET.iterparse(full_file, events=('start', 'end', 'start-ns', '
     if event == 'end':
         if elem.tag == fixtag('', 'entry', nsmap):
             e = int(process_entry(elem, nsmap))
-            if e > max_seq:
-                max_seq = e
-                print(max_seq)
+            if e > 3000:
+                seq_counter = seq_counter + 1
+                print(seq_counter)
             elem.clear()
 
-print(max_seq)
+print(seq_counter)
 print('That\'s all folks!')
 
-# 1206
-# 2337
-# 2382
-# 3100
-# 18562
-# 35213
-# 35213
-# That's all folks!
+
+# max sequence length: 35213
+# 451 entries with sequence length longer than 3000.
