@@ -15,7 +15,6 @@ file_name = 'uniprot-ec__+AND+reviewed_yes.xml'
 full_file = os.path.abspath(os.path.join(file_name))
 
 nsmap = {}
-dataset = []
 
 for event, elem in ET.iterparse(full_file, events=('start', 'end', 'start-ns', 'end-ns')):
     if event == 'start-ns':
@@ -24,8 +23,7 @@ for event, elem in ET.iterparse(full_file, events=('start', 'end', 'start-ns', '
 
     if event == 'end':
         if elem.tag == xml_parse_methods.fixtag('', 'entry', nsmap):
-            dataset += xml_parse_methods.process_entry(elem, nsmap)
+            xml_parse_methods.process_entry(elem, nsmap)
             elem.clear()
 
-print(dataset)
 print('That\'s all folks!')
