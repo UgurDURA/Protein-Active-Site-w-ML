@@ -14,11 +14,11 @@ TODO:
 
 '''
 
-
 import os
 
 file_name = 'ExampleDATA.xml'
 full_file = os.path.abspath(os.path.join(file_name))
+
 
 #
 # def get_string_or_none(element_list, delimiter):
@@ -60,10 +60,8 @@ def process_entry(entry, ns):
         accession_string = accession.text
         ec_number_string = ec_number.text
 
-
         print(accession_string + ', ' + ec_number_string + ', ' + sequence_length)
         print(sequence_string)
-
 
     except Exception as e:
         print(e)
