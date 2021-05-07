@@ -6,9 +6,10 @@ TODO:
 > keras Transformer Model:
     - preprocess
         > divide into training/validation
+    - character based tokenization
     - embedding
-    - pos embedding
-    - encoder & decoder
+    - pos encoding
+    - encoder & decoder blocks
         > self-attention, masking, feedforward
     - output formatting
     - train and evaluate
@@ -16,6 +17,10 @@ TODO:
 > parse and train in batches?
 
 '''
+
+import xml_parser
+import os
+import xml.etree.ElementTree as ET
 
 import sqlite3
 con = sqlite3.connect('Enzymes.db')
@@ -49,3 +54,23 @@ def process_entry(entry, ns):
 
 def fixtag(ns, tag, nsmap):
     return '{' + nsmap[ns] + '}' + tag
+
+
+file_name = 'ExampleDATA.xml'
+full_file = os.path.abspath(os.path.join(file_name))
+
+nsmap = {}
+
+for event, elem in ET.iterparse(full_file, events=('start', 'end', 'start-ns', 'end-ns')):
+    if event == 'start-ns':
+        ns, url = elem
+        nsmap[ns] = url
+
+    if event == 'end':
+        if elem.tag == xml_parser.fixtag('', 'entry', nsmap):
+            xml_parser.process_entry(elem, nsmap)
+
+            elem.clear()
+
+print('That\'s all folks!')
+
