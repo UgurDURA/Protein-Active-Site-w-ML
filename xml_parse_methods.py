@@ -16,6 +16,7 @@ TODO:
 
 import os
 
+
 file_name = 'ExampleDATA.xml'
 full_file = os.path.abspath(os.path.join(file_name))
 
@@ -60,11 +61,11 @@ def process_entry(entry, ns):
         accession_string = accession.text
         ec_number_string = ec_number.text
 
-        print(accession_string + ', ' + ec_number_string + ', ' + sequence_length)
-        print(sequence_string)
-
+        return sequence_length,sequence_string,accession_string,ec_number_string
     except Exception as e:
         print(e)
+
+
 
 
 def fixtag(ns, tag, nsmap):
