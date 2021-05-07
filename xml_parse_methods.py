@@ -15,9 +15,11 @@ TODO:
 '''
 
 import os
+import sqlite3
+con=sqlite3.connect('Enzymes.db')
 
 
-file_name = 'ExampleDATA.xml'
+file_name = 'uniprot-ec__+AND+reviewed_yes.xml'
 full_file = os.path.abspath(os.path.join(file_name))
 
 
@@ -61,7 +63,10 @@ def process_entry(entry, ns):
         accession_string = accession.text
         ec_number_string = ec_number.text
 
-        return sequence_length,sequence_string,accession_string,ec_number_string
+        cur.execute("INSERT INTO Entries(accession_string, ec_number_string, sequence_length, sequence_string) VALUES ('{0}','{1}',{2},'{3}')".format(accession_string, ec_number_string, sequence_length, sequence_string))
+        con.commit()
+
+      
     except Exception as e:
         print(e)
 
