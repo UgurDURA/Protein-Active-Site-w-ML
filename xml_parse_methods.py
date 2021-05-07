@@ -16,8 +16,8 @@ TODO:
 
 import os
 import sqlite3
-con=sqlite3.connect('Enzymes.db')
-
+con = sqlite3.connect('Enzymes.db')
+cur = con.cursor()
 
 file_name = 'uniprot-ec__+AND+reviewed_yes.xml'
 full_file = os.path.abspath(os.path.join(file_name))
@@ -69,8 +69,6 @@ def process_entry(entry, ns):
       
     except Exception as e:
         print(e)
-
-
 
 
 def fixtag(ns, tag, nsmap):
