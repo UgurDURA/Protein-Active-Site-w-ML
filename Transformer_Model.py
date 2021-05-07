@@ -8,11 +8,10 @@ import xml_parse_methods
 import os
 import xml.etree.ElementTree as ET
 
-
 # keras model configuration
 
 
-file_name = 'uniprot-ec__+AND+reviewed_yes.xml'
+file_name = 'ExampleDATA.xml'
 full_file = os.path.abspath(os.path.join(file_name))
 
 nsmap = {}

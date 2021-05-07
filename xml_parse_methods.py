@@ -1,5 +1,8 @@
 '''
 TODO:
+> configure plugins
+> initialize database table before insertions
+
 > keras Transformer Model:
     - preprocess
         > divide into training/validation
@@ -14,16 +17,15 @@ TODO:
 
 '''
 
-import os
+#import os
 import sqlite3
 con = sqlite3.connect('Enzymes.db')
 cur = con.cursor()
 
-file_name = 'uniprot-ec__+AND+reviewed_yes.xml'
-full_file = os.path.abspath(os.path.join(file_name))
+# file_name = 'uniprot-ec__+AND+reviewed_yes.xml'
+# full_file = os.path.abspath(os.path.join(file_name))
 
 
-#
 # def get_string_or_none(element_list, delimiter):
 #     list_text = ''
 #     try:
@@ -66,7 +68,6 @@ def process_entry(entry, ns):
         cur.execute("INSERT INTO Entries(accession_string, ec_number_string, sequence_length, sequence_string) VALUES ('{0}','{1}',{2},'{3}')".format(accession_string, ec_number_string, sequence_length, sequence_string))
         con.commit()
 
-      
     except Exception as e:
         print(e)
 
