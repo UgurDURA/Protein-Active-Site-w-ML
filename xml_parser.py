@@ -18,13 +18,14 @@ TODO:
 
 '''
 
-import xml_parser
 import os
 import xml.etree.ElementTree as ET
 
 import sqlite3
+
 con = sqlite3.connect('Enzymes.db')
 cur = con.cursor()
+
 
 def process_entry(entry, ns):
     try:
@@ -45,7 +46,8 @@ def process_entry(entry, ns):
         accession_string = accession.text
         ec_number_string = ec_number.text
 
-        cur.execute("INSERT INTO Entries(accession_string, ec_number_string, sequence_length, sequence_string) VALUES ('{0}','{1}',{2},'{3}')".format(accession_string, ec_number_string, sequence_length, sequence_string))
+        cur.execute("INSERT INTO Entries(accession_string, ec_number_string, sequence_length, sequence_string) VALUES "
+                    "('{0}', '{1}', '{2}', '{3}')".format(accession_string, ec_number_string, sequence_length, sequence_string))
         con.commit()
 
     except Exception as e:
@@ -67,10 +69,11 @@ for event, elem in ET.iterparse(full_file, events=('start', 'end', 'start-ns', '
         nsmap[ns] = url
 
     if event == 'end':
-        if elem.tag == xml_parser.fixtag('', 'entry', nsmap):
-            xml_parser.process_entry(elem, nsmap)
+        if elem.tag == fixtag('', 'entry', nsmap):
+            process_entry(elem, nsmap)
 
             elem.clear()
 
 print('That\'s all folks!')
-
+for row in cur.execute('SELECT rowid, * FROM Entries'):
+    print(row)
