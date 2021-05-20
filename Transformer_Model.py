@@ -1,8 +1,9 @@
 '''
 TODO: Transformer model tasks
 >[check] tokenization
+> [] wrap tokenization into a method.
 >[check] positional encoding
->[] token embedding
+>[check] token embedding
 >[] combine embeddings
 > test detokenization?
 
@@ -28,7 +29,6 @@ print(s)
 vocab = len(tok.word_index)
 print(vocab)
 
-
 embed_dims = 10  # Embedding size for each token
 num_heads = 4  # Number of attention heads
 ff_dim = 10  # Hidden layer size in feed forward network inside transformer
@@ -40,15 +40,15 @@ class embeddings_layer(layers.Layer):
     """
 
     def __init__(self, vocab_size, embed_dim):  # initialize with layer's attributes
-        super(embeddings_layer, self).__init__()    # ??
-        self.token_emb = layers.Embedding(input_dim=vocab_size, output_dim=embed_dim)
+        super(embeddings_layer, self).__init__()  # ??
+        self.token_emb = layers.Embedding(input_dim=vocab_size+1, output_dim=embed_dim)
         self.embed_dim = embed_dim
         print("init")
 
     def call(self, x):  # call with the input
 
         pos = self.positional_encoding(len(x), self.embed_dim)
-        x = self.token_emb(x)  #fix input typing here!
+        x = self.token_emb(tf.cast(x, dtype=tf.int32))
         print("call")
 
         return x + pos
@@ -76,5 +76,3 @@ class embeddings_layer(layers.Layer):
 imtesting = embeddings_layer(vocab, embed_dims)
 
 print(imtesting(s))
-# print(imtesting.positional_encoding(len(s), embed_dims))
-
