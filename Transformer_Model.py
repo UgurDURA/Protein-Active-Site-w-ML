@@ -9,8 +9,8 @@ TODO: Transformer model tasks
 
 > encoding and decoding blocks:
 > [] modify encoder block
+    > research normalization layer
 > [] implement decoder block: fixed-length (4 tokens) output
-s
 
 '''
 
@@ -19,18 +19,18 @@ import tensorflow as tf
 from tensorflow.keras import layers
 
 # tokenizer
-tok = tf.keras.preprocessing.text.Tokenizer(num_words=0, filters=None, lower=False, char_level=True)
+input_tok = tf.keras.preprocessing.text.Tokenizer(num_words=0, filters=None, lower=False, char_level=True)
 
 # feed list of integers into fit_on_texts()
 # s: example sequence
 s = 'MLPPWTLGLLLLATVRGKEVCYGQLGCFSDEKPWAGTLQRPVKLLPWSPEDIDTRFLLYTNENPNNFQLITGTEPDTIEASNFQLDRKTRFIIHGFLDKAEDSWPSDMCKKMFEVEKVNCICVDWRHGSRAMYTQAVQNIRVVGAETAFLIQALSTQLGYSLEDVHVIGHSLGAHTAAEAGRRLGGRVGRITGLDPAGPCFQDEPEEVRLDPSDAVFVDVIHTDSSPIVPSLGFGMSQKVGHLDFFPNGGKEMPGCKKNVLSTITDIDGIWEGIGGFVSCNHLRSFEYYSSSVLNPDGFLGYPCASYDEFQESKCFPCPAEGCPKMGHYADQFKGKTSAVEQTFFLNTGESGNFTSWRYKISVTLSGKEKVNGYIRIALYGSNENSKQYEIFKGSLKPDASHTCAIDVDFNVGKIQKVKFLWNKRGINLSEPKLGASQITVQSGEDGTEYNFCSSDTVEENVLQSLYPC '
 ec = '1.1.1.1'
 
-tok.fit_on_texts(s)
+input_tok.fit_on_texts(s)
 print(s)
-s = tok.texts_to_sequences(s)
+s = input_tok.texts_to_sequences(s)
 print(s)
-vocab = len(tok.word_index)
+vocab = len(input_tok.word_index)
 print(vocab)
 
 embed_dims = 10  # Embedding size for each token
@@ -78,7 +78,7 @@ class embeddings_layer(layers.Layer):
 
 
 class TransformerBlock(layers.Layer):
-    def __init__(self, embed_dim, num_heads, ff_dim, rate=0.1):
+    def __init__(self, embed_dim, num_heads, ff_dim, rate=0.1):  # rate: dropout rate.
         super(TransformerBlock, self).__init__()
         self.att = layers.MultiHeadAttention(num_heads=num_heads, key_dim=embed_dim)
         self.ffn = tf.keras.Sequential(
