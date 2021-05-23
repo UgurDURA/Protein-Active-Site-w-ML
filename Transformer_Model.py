@@ -8,6 +8,9 @@ TODO: Transformer model tasks
 > test detokenization?
 
 > encoding and decoding blocks:
+> [] modify encoder block
+> [] implement decoder block: fixed-length (4 tokens) output
+s
 
 '''
 
