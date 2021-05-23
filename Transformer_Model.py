@@ -1,13 +1,13 @@
 '''
 TODO: Transformer model tasks
 >[check] tokenization
-> [] wrap tokenization into a method.
 >[check] positional encoding
 >[check] token embedding
->[] combine embeddings
+>[check] combine embeddings
+> [] wrap tokenization into a method.
 > test detokenization?
 
-> encoding and decoding blocks
+> encoding and decoding blocks:
 
 '''
 
@@ -21,6 +21,7 @@ tok = tf.keras.preprocessing.text.Tokenizer(num_words=0, filters=None, lower=Fal
 # feed list of integers into fit_on_texts()
 # s: example sequence
 s = 'MLPPWTLGLLLLATVRGKEVCYGQLGCFSDEKPWAGTLQRPVKLLPWSPEDIDTRFLLYTNENPNNFQLITGTEPDTIEASNFQLDRKTRFIIHGFLDKAEDSWPSDMCKKMFEVEKVNCICVDWRHGSRAMYTQAVQNIRVVGAETAFLIQALSTQLGYSLEDVHVIGHSLGAHTAAEAGRRLGGRVGRITGLDPAGPCFQDEPEEVRLDPSDAVFVDVIHTDSSPIVPSLGFGMSQKVGHLDFFPNGGKEMPGCKKNVLSTITDIDGIWEGIGGFVSCNHLRSFEYYSSSVLNPDGFLGYPCASYDEFQESKCFPCPAEGCPKMGHYADQFKGKTSAVEQTFFLNTGESGNFTSWRYKISVTLSGKEKVNGYIRIALYGSNENSKQYEIFKGSLKPDASHTCAIDVDFNVGKIQKVKFLWNKRGINLSEPKLGASQITVQSGEDGTEYNFCSSDTVEENVLQSLYPC '
+ec = '1.1.1.1'
 
 tok.fit_on_texts(s)
 print(s)
@@ -30,7 +31,7 @@ vocab = len(tok.word_index)
 print(vocab)
 
 embed_dims = 10  # Embedding size for each token
-num_heads = 4  # Number of attention heads
+num_heads = 5  # Number of attention heads
 ff_dim = 10  # Hidden layer size in feed forward network inside transformer
 
 
@@ -41,7 +42,7 @@ class embeddings_layer(layers.Layer):
 
     def __init__(self, vocab_size, embed_dim):  # initialize with layer's attributes
         super(embeddings_layer, self).__init__()  # ??
-        self.token_emb = layers.Embedding(input_dim=vocab_size+1, output_dim=embed_dim)
+        self.token_emb = layers.Embedding(input_dim=vocab_size + 1, output_dim=embed_dim)
         self.embed_dim = embed_dim
         print("init")
 
@@ -73,6 +74,30 @@ class embeddings_layer(layers.Layer):
         return tf.cast(pos_encoding, dtype=tf.float32)  # output is in tensor form.
 
 
-imtesting = embeddings_layer(vocab, embed_dims)
+class TransformerBlock(layers.Layer):
+    def __init__(self, embed_dim, num_heads, ff_dim, rate=0.1):
+        super(TransformerBlock, self).__init__()
+        self.att = layers.MultiHeadAttention(num_heads=num_heads, key_dim=embed_dim)
+        self.ffn = tf.keras.Sequential(
+            [layers.Dense(ff_dim, activation="relu"), layers.Dense(embed_dim), ]
+        )
+        self.layernorm1 = layers.LayerNormalization(epsilon=1e-6)
+        self.layernorm2 = layers.LayerNormalization(epsilon=1e-6)
+        self.dropout1 = layers.Dropout(rate)
+        self.dropout2 = layers.Dropout(rate)
 
-print(imtesting(s))
+    def call(self, inputs, training):
+        attn_output = self.att(inputs, inputs)
+        attn_output = self.dropout1(attn_output, training=training)
+        out1 = self.layernorm1(inputs + attn_output)
+        ffn_output = self.ffn(out1)
+        ffn_output = self.dropout2(ffn_output, training=training)
+        return self.layernorm2(out1 + ffn_output)
+
+
+imtesting_emb = embeddings_layer(vocab, embed_dims)
+x = imtesting_emb(s)
+imtesting_trn = TransformerBlock(embed_dim=embed_dims, num_heads=num_heads, ff_dim=ff_dim)
+x = imtesting_trn(x)
+
+print(x)
