@@ -47,15 +47,18 @@ class embeddings_layer(layers.Layer):
         super(embeddings_layer, self).__init__()  # ??
         self.token_emb = layers.Embedding(input_dim=vocab_size + 1, output_dim=embed_dim)
         self.embed_dim = embed_dim
-        print("init")
+        print("embeddings: init")
 
     def call(self, x):  # call with the input
-
+        print("embeddings: call")
+        length = len(x)
         pos = self.positional_encoding(len(x), self.embed_dim)
-        x = self.token_emb(tf.cast(x, dtype=tf.int32))
-        print("call")
 
-        return x + pos
+        x = self.token_emb(tf.cast(x, dtype=tf.int32))      # shape: (lentgh, 1, mbed_dim )
+
+        r = tf.reshape(x, [length, self.embed_dim]) + tf.reshape(pos, [length, self.embed_dim])
+        # ^ removes the redundant extra dimensions. output is tensor of shape (length, embed_dim).
+        return r
 
     def get_angles(self, pos, i, d_model):
         angle_rates = 1 / np.power(10000, (2 * (i // 2)) / np.float32(d_model))
@@ -88,8 +91,10 @@ class TransformerBlock(layers.Layer):
         self.layernorm2 = layers.LayerNormalization(epsilon=1e-6)
         self.dropout1 = layers.Dropout(rate)
         self.dropout2 = layers.Dropout(rate)
+        print("encoder: init")
 
     def call(self, inputs, training):
+        print("encoder: call")
         attn_output = self.att(inputs, inputs)
         attn_output = self.dropout1(attn_output, training=training)
         out1 = self.layernorm1(inputs + attn_output)
@@ -100,7 +105,9 @@ class TransformerBlock(layers.Layer):
 
 imtesting_emb = embeddings_layer(vocab, embed_dims)
 x = imtesting_emb(s)
-imtesting_trn = TransformerBlock(embed_dim=embed_dims, num_heads=num_heads, ff_dim=ff_dim)
-x = imtesting_trn(x)
+print(x.shape)
 
-print(x)
+# imtesting_trn = TransformerBlock(embed_dim=embed_dims, num_heads=num_heads, ff_dim=ff_dim)
+# x = imtesting_trn(x)
+#
+# print(x.shape)
