@@ -51,13 +51,11 @@ class embeddings_layer(layers.Layer):
 
     def call(self, x):  # call with the input
         print("embeddings: call")
-        length = len(x)
-        pos = self.positional_encoding(len(x), self.embed_dim)
+        length= len(x)
+        pos = self.positional_encoding(len(x), self.embed_dim)  # shape: (1, length, mbed_dim)
+        x = self.token_emb(tf.cast(x, dtype=tf.int32))          # shape: (lentgh, 1, mbed_dim)
 
-        x = self.token_emb(tf.cast(x, dtype=tf.int32))      # shape: (lentgh, 1, mbed_dim )
-
-        r = tf.reshape(x, [length, self.embed_dim]) + tf.reshape(pos, [length, self.embed_dim])
-        # ^ removes the redundant extra dimensions. output is tensor of shape (length, embed_dim).
+        r = tf.reshape(x, [1, length, self.embed_dim]) + pos
         return r
 
     def get_angles(self, pos, i, d_model):
@@ -107,7 +105,7 @@ imtesting_emb = embeddings_layer(vocab, embed_dims)
 x = imtesting_emb(s)
 print(x.shape)
 
-# imtesting_trn = TransformerBlock(embed_dim=embed_dims, num_heads=num_heads, ff_dim=ff_dim)
-# x = imtesting_trn(x)
-#
-# print(x.shape)
+imtesting_trn = TransformerBlock(embed_dim=embed_dims, num_heads=num_heads, ff_dim=ff_dim)
+x = imtesting_trn(x)
+
+print(x.shape)
