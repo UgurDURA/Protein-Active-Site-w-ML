@@ -1,11 +1,11 @@
 '''
 TODO: Transformer model tasks
->[check] tokenization
+>[check] input & output tokenization
 >[check] positional encoding
 >[check] token embedding
 >[check] combine embeddings
+> test detokenization -> sequences_to_text()
 > [] wrap tokenization into a method.
-> test detokenization? >sequences_to_text()
 
 > encoding and decoding blocks:
 > [] modify encoder block
