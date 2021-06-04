@@ -18,13 +18,14 @@ import numpy as np
 import tensorflow as tf
 from tensorflow.keras import layers
 
-# tokenizer
+# tokenizers
 input_tok = tf.keras.preprocessing.text.Tokenizer(num_words=0, filters=None, lower=False, char_level=True)
+output_tok = tf.keras.preprocessing.text.Tokenizer(num_words=0, filters=None, lower=False, split=".", char_level=False)
 
 # feed list of integers into fit_on_texts()
 # s: example sequence
 s = 'MLPPWTLGLLLLATVRGKEVCYGQLGCFSDEKPWAGTLQRPVKLLPWSPEDIDTRFLLYTNENPNNFQLITGTEPDTIEASNFQLDRKTRFIIHGFLDKAEDSWPSDMCKKMFEVEKVNCICVDWRHGSRAMYTQAVQNIRVVGAETAFLIQALSTQLGYSLEDVHVIGHSLGAHTAAEAGRRLGGRVGRITGLDPAGPCFQDEPEEVRLDPSDAVFVDVIHTDSSPIVPSLGFGMSQKVGHLDFFPNGGKEMPGCKKNVLSTITDIDGIWEGIGGFVSCNHLRSFEYYSSSVLNPDGFLGYPCASYDEFQESKCFPCPAEGCPKMGHYADQFKGKTSAVEQTFFLNTGESGNFTSWRYKISVTLSGKEKVNGYIRIALYGSNENSKQYEIFKGSLKPDASHTCAIDVDFNVGKIQKVKFLWNKRGINLSEPKLGASQITVQSGEDGTEYNFCSSDTVEENVLQSLYPC '
-ec = '1.1.1.1'
+ec = '4.3.1.2'
 
 input_tok.fit_on_texts(s)
 print(s)
@@ -32,6 +33,10 @@ s = input_tok.texts_to_sequences(s)
 print(s)
 vocab = len(input_tok.word_index)
 print(vocab)
+
+output_tok.fit_on_texts(ec)
+ec = output_tok.texts_to_sequences(ec)
+print(ec)
 
 embed_dims = 10  # Embedding size for each token
 num_heads = 5  # Number of attention heads
