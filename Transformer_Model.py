@@ -12,6 +12,8 @@ TODO: Transformer model tasks
     > research normalization layer
 > [] implement decoder block: fixed-length (4 tokens) output
 
+https://keras.io/api/models/model_training_apis/
+https://keras.io/guides/serialization_and_saving/
 '''
 
 import numpy as np
