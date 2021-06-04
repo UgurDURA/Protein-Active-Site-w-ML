@@ -5,7 +5,7 @@ TODO: Transformer model tasks
 >[check] token embedding
 >[check] combine embeddings
 > [] wrap tokenization into a method.
-> test detokenization?
+> test detokenization? >sequences_to_text()
 
 > encoding and decoding blocks:
 > [] modify encoder block
@@ -20,12 +20,12 @@ from tensorflow.keras import layers
 
 # tokenizers
 input_tok = tf.keras.preprocessing.text.Tokenizer(num_words=0, filters=None, lower=False, char_level=True)
-output_tok = tf.keras.preprocessing.text.Tokenizer(num_words=0, filters=None, lower=False, split=".", char_level=False)
+output_tok = tf.keras.preprocessing.text.Tokenizer(num_words=0, filters=None, lower=False, split='.', char_level=False)
 
 # feed list of integers into fit_on_texts()
 # s: example sequence
 s = 'MLPPWTLGLLLLATVRGKEVCYGQLGCFSDEKPWAGTLQRPVKLLPWSPEDIDTRFLLYTNENPNNFQLITGTEPDTIEASNFQLDRKTRFIIHGFLDKAEDSWPSDMCKKMFEVEKVNCICVDWRHGSRAMYTQAVQNIRVVGAETAFLIQALSTQLGYSLEDVHVIGHSLGAHTAAEAGRRLGGRVGRITGLDPAGPCFQDEPEEVRLDPSDAVFVDVIHTDSSPIVPSLGFGMSQKVGHLDFFPNGGKEMPGCKKNVLSTITDIDGIWEGIGGFVSCNHLRSFEYYSSSVLNPDGFLGYPCASYDEFQESKCFPCPAEGCPKMGHYADQFKGKTSAVEQTFFLNTGESGNFTSWRYKISVTLSGKEKVNGYIRIALYGSNENSKQYEIFKGSLKPDASHTCAIDVDFNVGKIQKVKFLWNKRGINLSEPKLGASQITVQSGEDGTEYNFCSSDTVEENVLQSLYPC '
-ec = '4.3.1.2'
+ec = '4.3.1.2' #, '3.12.6.-']
 
 input_tok.fit_on_texts(s)
 print(s)
@@ -34,9 +34,23 @@ print(s)
 vocab = len(input_tok.word_index)
 print(vocab)
 
+# ec = ec.replace('.', ' ')
+print(ec)
+print(type(ec))
 output_tok.fit_on_texts(ec)
 ec = output_tok.texts_to_sequences(ec)
 print(ec)
+
+# def output_tok(m):
+#     x = []
+#     for num in m:
+#         if num != '.' or num != '-':
+#             x.append([int(num)])
+#         elif num == '-':
+#             x.append([1000])
+#     return x
+
+
 
 embed_dims = 10  # Embedding size for each token
 num_heads = 5  # Number of attention heads
