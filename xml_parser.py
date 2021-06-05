@@ -28,7 +28,9 @@ cur = con.cursor()
 
 
 def process_entry(entry, ns):
+    ec_number = ''
     try:
+
         accession = entry.find('{' + ns[''] + '}' + 'accession')
         protein = entry.find('{' + ns[''] + '}' + 'protein')
         recommended_name = protein.find('{' + ns[''] + '}' + 'recommendedName')
@@ -58,7 +60,7 @@ def fixtag(ns, tag, nsmap):
     return '{' + nsmap[ns] + '}' + tag
 
 
-file_name = 'ExampleDATA.xml'
+file_name = 'uniprot-ec__+AND+reviewed_yes.xml'
 full_file = os.path.abspath(os.path.join(file_name))
 
 nsmap = {}
