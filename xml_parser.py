@@ -1,22 +1,3 @@
-'''
-TODO:
-> configure plugins
-> initialize database table before insertions
-
-> keras Transformer Model:
-    - preprocess
-        > divide into training/validation
-    - character based tokenization
-    - embedding
-    - pos encoding
-    - encoder & decoder blocks
-        > self-attention, masking, feedforward
-    - output formatting
-    - train and evaluate
-
-> parse and train in batches?
-
-'''
 
 import os
 import xml.etree.ElementTree as ET
@@ -28,9 +9,8 @@ cur = con.cursor()
 
 
 def process_entry(entry, ns):
-    ec_number = ''
     try:
-
+        ec_number = ''
         accession = entry.find('{' + ns[''] + '}' + 'accession')
         protein = entry.find('{' + ns[''] + '}' + 'protein')
         recommended_name = protein.find('{' + ns[''] + '}' + 'recommendedName')
