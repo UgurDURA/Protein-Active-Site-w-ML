@@ -5,7 +5,15 @@ TODO: Transformer model tasks
 >[check] token embedding
 >[check] combine embeddings
 > test detokenization -> sequences_to_text()
+
+> [check] modify encoder block
+> [] classification layer(s) to fit output format - 4 tokens: 4 classifctn layers?
+> [] decide and implement evaluation criteria
+
+data preprocessing steps:
 > [] wrap tokenization into a method.
+> store tokenized data?
+> [] method to divide/save data as train-validtn
 
 
 https://keras.io/api/models/model_training_apis/
