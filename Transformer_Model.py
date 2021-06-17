@@ -7,10 +7,6 @@ TODO: Transformer model tasks
 > test detokenization -> sequences_to_text()
 > [] wrap tokenization into a method.
 
-> encoding and decoding blocks:
-> [] modify encoder block
-    > research normalization layer
-> [] implement decoder block: fixed-length (4 tokens) output
 
 https://keras.io/api/models/model_training_apis/
 https://keras.io/guides/serialization_and_saving/
@@ -91,25 +87,32 @@ class TransformerBlock(layers.Layer):
         )
         self.layernorm1 = layers.LayerNormalization(epsilon=1e-6)
         self.layernorm2 = layers.LayerNormalization(epsilon=1e-6)
-        self.dropout1 = layers.Dropout(rate)
-        self.dropout2 = layers.Dropout(rate)
+        # self.dropout1 = layers.Dropout(rate)
+        # self.dropout2 = layers.Dropout(rate)
         print("encoder: init")
 
     def call(self, inputs, training):
         print("encoder: call")
         attn_output = self.att(inputs, inputs)
-        attn_output = self.dropout1(attn_output, training=training)
+        # attn_output = self.dropout1(attn_output, training=training)
         out1 = self.layernorm1(inputs + attn_output)
         ffn_output = self.ffn(out1)
-        ffn_output = self.dropout2(ffn_output, training=training)
+        # ffn_output = self.dropout2(ffn_output, training=training)
         return self.layernorm2(out1 + ffn_output)
 
 
+inputs = layers.Input()     # input layer of unspecified dimensions
 imtesting_emb = embeddings_layer(vocab, embed_dims)
-x = imtesting_emb(s)
-print(x.shape)
-
+x = imtesting_emb(inputs)
 imtesting_trn = TransformerBlock(embed_dim=embed_dims, num_heads=num_heads, ff_dim=ff_dim)
 x = imtesting_trn(x)
+x = layers.Dropout(0.1)(x)
+x = layers.Dense(20, activation="relu")(x)
+x = layers.Dropout(0.1)(x)
+outputs = layers.Dense(4, activation="softmax")(x)
 
-print(x.shape)
+model = tf.keras.Model(inputs=inputs, outputs=outputs)
+
+
+
+
