@@ -4,14 +4,14 @@ TODO: Transformer model tasks
 >[check] positional encoding
 >[check] token embedding
 >[check] combine embeddings
-> test detokenization -> sequences_to_text()
+>[check] test detokenization -> sequences_to_text()
 
 > [check] modify encoder block
 > [] classification layer(s) to fit output format - 4 tokens: 4 classifctn layers?
 > [] decide and implement evaluation criteria
 
 data preprocessing steps:
-> [] wrap tokenization into a method.
+> [check] tokenizer training in separate script.
 > store tokenized data?
 > [] method to divide/save data as train-validtn
 
@@ -21,25 +21,33 @@ https://keras.io/guides/serialization_and_saving/
 '''
 
 import numpy as np
+import json
 import tensorflow as tf
 from tensorflow.keras import layers
 
-# tokenizers
-input_tok = tf.keras.preprocessing.text.Tokenizer(num_words=0, filters=None, lower=False, char_level=True)
-output_tok = tf.keras.preprocessing.text.Tokenizer(num_words=0, filters='#$%&()+/<=>?@\\^{|}~', lower=False, split='.', char_level=False)
 
-# feed list of integers into fit_on_texts()
+# feed list of strings into fit_on_texts()
 # s: example sequence
 s = ['MLPPWTLGLLLLATVRGKEVCYGQLGCFSDEKPWAGTLQRPVKLLPWSPEDIDTRFLLYTNENPNNFQLITGTEPDTIEASNFQLDRKTRFIIHGFLDKAEDSWPSDMCKKMFEVEKVNCICVDWRHGSRAMYTQAVQNIRVVGAETAFLIQALSTQLGYSLEDVHVIGHSLGAHTAAEAGRRLGGRVGRITGLDPAGPCFQDEPEEVRLDPSDAVFVDVIHTDSSPIVPSLGFGMSQKVGHLDFFPNGGKEMPGCKKNVLSTITDIDGIWEGIGGFVSCNHLRSFEYYSSSVLNPDGFLGYPCASYDEFQESKCFPCPAEGCPKMGHYADQFKGKTSAVEQTFFLNTGESGNFTSWRYKISVTLSGKEKVNGYIRIALYGSNENSKQYEIFKGSLKPDASHTCAIDVDFNVGKIQKVKFLWNKRGINLSEPKLGASQITVQSGEDGTEYNFCSSDTVEENVLQSLYPC ',
 'MIGRLNHVAIAVPDLEAAAAQYRNTLGAEVGAPQDEPDHGVTVIFITLPNTKIELLHPLGEGSPIAGFLEKNPAGGIHHICYEVEDILAARDRLKEAGARVLGSGEPKIGAHGKPVLFLHPKDFNGCLVELEQV']
 ec = ['4.1.1.15', '5.1.99.-']
 
-input_tok.fit_on_texts(s)
+
+# tokenizers
+input_tok, output_tok = [], []
+
+with open('input_tok_config.txt') as json_file:
+    config = json.load(json_file)
+    input_tok = tf.keras.preprocessing.text.tokenizer_from_json(config)
+
+with open('output_tok_config.txt') as json_file:
+    config = json.load(json_file)
+    output_tok = tf.keras.preprocessing.text.tokenizer_from_json(config)
+
 s = input_tok.texts_to_sequences(s)
+ec = output_tok.texts_to_sequences(ec)
 vocab = len(input_tok.word_index)
 
-output_tok.fit_on_texts(ec)
-ec = output_tok.texts_to_sequences(ec)
 
 embed_dims = 10  # Embedding size for each token
 num_heads = 5  # Number of attention heads
