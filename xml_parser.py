@@ -4,10 +4,10 @@ import xml.etree.ElementTree as ET
 
 import sqlite3
 
-con = sqlite3.connect('[DATA]\DB\EnzymeData.db')
+con = sqlite3.connect('[DATA]\DB\Enzymes.db')
 cur = con.cursor()
-# cur.execute('''CREATE TABLE Enzymes
-#              (EnzymeAutoID int IDENTITY(1,1) PRIMARY KEY,[accession_string] text, [ec_number_string] text,[sequence_length] integer,[sequence_string] text )''')
+
+cur.execute('CREATE TABLE Entries(EnzymeAutoID integer primary key autoincrement, accession_string str, ec_number_string str, sequence_length int, sequence_string str )')
 
 def process_entry(entry, ns):
     try:
@@ -33,7 +33,11 @@ def process_entry(entry, ns):
 
         cur.execute("INSERT INTO Entries(accession_string, ec_number_string, sequence_length, sequence_string) VALUES "
                     "('{0}', '{1}', '{2}', '{3}')".format(accession_string, ec_number_string, sequence_length, sequence_string))
+        
         con.commit()
+
+
+       
 
     except Exception as e:
         print(e)
@@ -43,7 +47,7 @@ def fixtag(ns, tag, nsmap):
     return '{' + nsmap[ns] + '}' + tag
 
 
-file_name = '[DATA]\UniProt\uniprot_sprot.xml'
+file_name = '[DATA]/UniProt/uniprot_sprot.xml'
 full_file = os.path.abspath(os.path.join(file_name))
 
 nsmap = {}
