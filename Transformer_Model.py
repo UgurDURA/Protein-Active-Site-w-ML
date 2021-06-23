@@ -129,7 +129,7 @@ class TokenAndPositionEmbedding(layers.Layer):
         x = self.token_emb(x)
         return x + positions
 
-inputs = layers.Input()     # input layer of unspecified dimensions
+inputs = layers.Input(shape=(35213,))    # input layer of unspecified dimensions
 imtesting_emb = embeddings_layer(vocab, embed_dims)
 x = imtesting_emb(inputs)
 imtesting_trn = TransformerBlock(embed_dim=embed_dims, num_heads=num_heads, ff_dim=ff_dim)
