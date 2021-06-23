@@ -116,6 +116,18 @@ class TransformerBlock(layers.Layer):
         # ffn_output = self.dropout2(ffn_output, training=training)
         return self.layernorm2(out1 + ffn_output)
 
+class TokenAndPositionEmbedding(layers.Layer):
+    def __init__(self, maxlen, vocab_size, embed_dim):
+        super(TokenAndPositionEmbedding, self).__init__()
+        self.token_emb = layers.Embedding(input_dim=vocab_size, output_dim=embed_dim)
+        self.pos_emb = layers.Embedding(input_dim=maxlen, output_dim=embed_dim)
+
+    def call(self, x):
+        maxlen = tf.shape(x)[-1]
+        positions = tf.range(start=0, limit=maxlen, delta=1)
+        positions = self.pos_emb(positions)
+        x = self.token_emb(x)
+        return x + positions
 
 inputs = layers.Input()     # input layer of unspecified dimensions
 imtesting_emb = embeddings_layer(vocab, embed_dims)
@@ -129,6 +141,9 @@ outputs = layers.Dense(4, activation="softmax")(x)
 
 model = tf.keras.Model(inputs=inputs, outputs=outputs)
 
-
+model.compile("adam", "sparse_categorical_crossentropy", metrics=["accuracy"])
+history = model.fit(
+    x_train, y_train, batch_size=32, epochs=2, validation_data=(x_val, y_val)
+)
 
 
