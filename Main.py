@@ -12,6 +12,8 @@ import time
 
 import numpy as np
 import pandas as pd
+import scipy as sp
+import sentencepiece as spm
 import matplotlib.pyplot as plt
 import tensorflow as tf
 import json
@@ -42,11 +44,36 @@ print(Ec_Number_test)
 print(Sequence_train)
 print(Sequence_test)
 
-for _examples, en_examples in train_examples.batch(3).take(1):
-  for pt in pt_examples.numpy():
-    print(pt.decode('utf-8'))
+def applyMask(dirtyData, dirty_idxs):
+    if (type(dirtyData)!=type(np.asarray([]))):
+        dirtyData=np.asarray(dirtyData)
 
-  print()
+    returnData= dirtyData[np.logical_not(dirty_idxs)]
 
-  for en in en_examples.numpy():
-    print(en.decode('utf-8'))
+    return returnData
+
+#Tokenization 
+
+path  = 'all.tab'
+int_path = 'interact.json'
+seq_path = 'pretraining_data.txt'
+model_path = 'm_reviewed.model'
+
+def filter_seqs():
+	"""
+	Filter sequences by length
+	"""
+	
+	seq_ls = [seq for seq in dataset['sequence_string'] if len(seq)<1024]
+	with open(seq_path, 'w') as filehandle:
+		for listitem in seq_ls:
+			filehandle.write('%s\n' % listitem)
+
+
+ 
+from transformer import BertForMaskedLM, BertTokenizer, pipeline
+tokenizer = BertTokenizer.from_pretrained("Rostlab/prot_bert", do_lower_case=False )
+model = BertForMaskedLM.from_pretrained("Rostlab/prot_bert")
+unmasker = pipeline('fill-mask', model=model, tokenizer=tokenizer)
+unmasker('D L I P T S S K L V V [MASK] D T S L Q V K K A F F A L V T')
+ 
