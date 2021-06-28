@@ -42,7 +42,7 @@ Sequence = dataset.iloc[:,-1].values  #Dependent values      #a better name coul
 print(Ec_Number)
 print(Sequence)
 
-#Data Analysis
+'Data Analysis'
  
 count_aminos={}
 length_seqs=[]
@@ -74,7 +74,7 @@ print('Deviation:', np.std(length_seqs))
 print('Min length:', np.min(length_seqs))
 print('Max length:', np.max(length_seqs))
 
-#Split dataset into test and validation
+'Split dataset into test and validation'
 
 #Important note for here, the split need to be performed after tokenization and embedding
 #I just added the code here 
