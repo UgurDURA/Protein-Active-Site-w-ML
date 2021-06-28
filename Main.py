@@ -42,6 +42,7 @@ Sequence = dataset.iloc[:,-1].values  #Dependent values      #a better name coul
 print(Ec_Number)
 print(Sequence)
 
+
 'Data Analysis'
  
 count_aminos={}
@@ -79,9 +80,9 @@ print('Max length:', np.max(length_seqs))
 #Important note for here, the split need to be performed after tokenization and embedding
 #I just added the code here 
 
-# from sklearn.model_selection import train_test_split
+from sklearn.model_selection import train_test_split
 
-# Ec_Number_train,Ec_Number_test,Sequence_train,Sequence_test =train_test_split(Ec_Number,Sequence,test_size=0.2, random_state=1)
+Ec_Number_train,Ec_Number_test,Sequence_train,Sequence_test =train_test_split(Ec_Number,Sequence,test_size=0.2, random_state=1)
 
 
 # print(Ec_Number_train)
@@ -89,6 +90,33 @@ print('Max length:', np.max(length_seqs))
 # print(Sequence_train)
 # print(Sequence_test)
 
+SequenceTestFile = open("SequenceTest.txt", "w")
+for element in Sequence_test:
+    SequenceTestFile.write(element + "\n")
+SequenceTestFile.close()
+
+print('Sequence Test Data Created Succesfully....')
+
+EcNumberTestFile = open("Ec_NumbersTest.txt", "w")
+for element in Ec_Number_test:
+    EcNumberTestFile.write(element + "\n")
+EcNumberTestFile.close()
+
+print('Ec Number Test Data Created Succesfully....')
+
+SequenceTrainingFile = open("SequencesTraining.txt", "w")
+for element in Sequence_train:
+    SequenceTrainingFile.write(element + "\n")
+SequenceTrainingFile.close()
+
+print('Sequence Training Data Created Succesfully....')
+
+EcNumberTrainingFile = open("Ec_NumbersTraining.txt", "w")
+for element in Ec_Number_train:
+    EcNumberTrainingFile.write(element + "\n")
+EcNumberTrainingFile.close()
+
+print('Ec Number Training Data Created Succesfully....')
 # def applyMask(dirtyData, dirty_idxs):
 #     if (type(dirtyData)!=type(np.asarray([]))):
 #         dirtyData=np.asarray(dirtyData)
