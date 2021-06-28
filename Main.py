@@ -1,6 +1,18 @@
 
 #This file created for trial
 
+
+# To do list
+
+'1- DATA PREPROCESSING '
+' 1.1 Access the Data'
+' 1.2 Spit the data into features and depandents'
+' 1.3 At the end of the preprocessing the data split it into Test and Validation'
+'2- TOKENIZATION'
+' 2.1 BPE Algorithym'
+' 2.2 '
+
+
 import collections
 import logging
 import os
@@ -13,7 +25,7 @@ import time
 import numpy as np
 import pandas as pd
 import scipy as sp
-import sentencepiece as spm
+# import sentencepiece as spm
 import matplotlib.pyplot as plt
 import tensorflow as tf
 import json
@@ -44,36 +56,36 @@ print(Ec_Number_test)
 print(Sequence_train)
 print(Sequence_test)
 
-def applyMask(dirtyData, dirty_idxs):
-    if (type(dirtyData)!=type(np.asarray([]))):
-        dirtyData=np.asarray(dirtyData)
+# def applyMask(dirtyData, dirty_idxs):
+#     if (type(dirtyData)!=type(np.asarray([]))):
+#         dirtyData=np.asarray(dirtyData)
 
-    returnData= dirtyData[np.logical_not(dirty_idxs)]
+#     returnData= dirtyData[np.logical_not(dirty_idxs)]
 
-    return returnData
+#     return returnData
 
-#Tokenization 
+# #Tokenization 
 
-path  = 'all.tab'
-int_path = 'interact.json'
-seq_path = 'pretraining_data.txt'
-model_path = 'm_reviewed.model'
+# path  = 'all.tab'
+# int_path = 'interact.json'
+# seq_path = 'pretraining_data.txt'
+# model_path = 'm_reviewed.model'
 
-def filter_seqs():
-	"""
-	Filter sequences by length
-	"""
+# def filter_seqs():
+# 	"""
+# 	Filter sequences by length
+# 	"""
 	
-	seq_ls = [seq for seq in dataset['sequence_string'] if len(seq)<1024]
-	with open(seq_path, 'w') as filehandle:
-		for listitem in seq_ls:
-			filehandle.write('%s\n' % listitem)
+# 	seq_ls = [seq for seq in dataset['sequence_string'] if len(seq)<1024]
+# 	with open(seq_path, 'w') as filehandle:
+# 		for listitem in seq_ls:
+# 			filehandle.write('%s\n' % listitem)
 
 
  
-from transformer import BertForMaskedLM, BertTokenizer, pipeline
-tokenizer = BertTokenizer.from_pretrained("Rostlab/prot_bert", do_lower_case=False )
-model = BertForMaskedLM.from_pretrained("Rostlab/prot_bert")
-unmasker = pipeline('fill-mask', model=model, tokenizer=tokenizer)
-unmasker('D L I P T S S K L V V [MASK] D T S L Q V K K A F F A L V T')
+# from transformer import BertForMaskedLM, BertTokenizer, pipeline
+# tokenizer = BertTokenizer.from_pretrained("Rostlab/prot_bert", do_lower_case=False )
+# model = BertForMaskedLM.from_pretrained("Rostlab/prot_bert")
+# unmasker = pipeline('fill-mask', model=model, tokenizer=tokenizer)
+# unmasker('D L I P T S S K L V V [MASK] D T S L Q V K K A F F A L V T')
  
