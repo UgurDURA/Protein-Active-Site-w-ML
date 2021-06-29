@@ -51,35 +51,35 @@ Sequence = list(dataset.iloc[:,-1].values)  #Dependent values      #a better nam
 
 'Data Analysis'
  
-# count_aminos={}
-# length_seqs=[]
-# for i, seq in enumerate(Sequence):
-#     length_seqs.append(len(seq))
-#     for a in seq:
-#         if a in count_aminos:
-#             count_aminos[a] += 1
-#         else:
-#             count_aminos[a] = 0
+count_aminos={}
+length_seqs=[]
+for i, seq in enumerate(Sequence):
+    length_seqs.append(len(seq))
+    for a in seq:
+        if a in count_aminos:
+            count_aminos[a] += 1
+        else:
+            count_aminos[a] = 0
 
-# unique_aminos=list(count_aminos.keys())
+unique_aminos=list(count_aminos.keys())
 
-# print('Unique aminos ({}):\n{}'.format(len(unique_aminos), unique_aminos))
-# x=[i for i in range(len(unique_aminos))]
-# plt.bar(x, count_aminos.values())
-# plt.xticks(x, unique_aminos)
-# print(list(count_aminos.values())[-5:])
-# plt.show()
+print('Unique aminos ({}):\n{}'.format(len(unique_aminos), unique_aminos))
+x=[i for i in range(len(unique_aminos))]
+plt.bar(x, count_aminos.values())
+plt.xticks(x, unique_aminos)
+print(list(count_aminos.values())[-5:])
+plt.show()
 
 
-# print('Average length:', np.mean(length_seqs))
-# print('Deviation:', np.std(length_seqs))
-# print('Min length:', np.min(length_seqs))
-# print('Max length:', np.max(length_seqs))
+print('Average length:', np.mean(length_seqs))
+print('Deviation:', np.std(length_seqs))
+print('Min length:', np.min(length_seqs))
+print('Max length:', np.max(length_seqs))
 
-# print('Average length:', np.mean(length_seqs))
-# print('Deviation:', np.std(length_seqs))
-# print('Min length:', np.min(length_seqs))
-# print('Max length:', np.max(length_seqs))
+print('Average length:', np.mean(length_seqs))
+print('Deviation:', np.std(length_seqs))
+print('Min length:', np.min(length_seqs))
+print('Max length:', np.max(length_seqs))
 
 'Split dataset into test and validation'
 
@@ -133,7 +133,9 @@ Ec_Number_train,Ec_Number_test,Sequence_train,Sequence_test =train_test_split(Ec
 
 #     return returnData
 
-# #Tokenization 
+
+
+"Tokenization "
 
 from transformers import BertForMaskedLM, BertTokenizer 
 import re
@@ -176,27 +178,3 @@ for element in Result:
 
 
 #Setup input pipeline
-
-# def tokenize_pairs(Ec_NumberTraining, SequenceTraining):
-#     Sq =
-#     # Convert from ragged to dense, padding with zeros.
-#     pt = pt.to_tensor()
-
-#     en = tokenizers.en.tokenize(en)
-#     # Convert from ragged to dense, padding with zeros.
-#     en = en.to_tensor()
-#     return pt, en
-
- 
-
-
- 
-# def tokenize_pairs(Ec_Number_train, Sequence):
-#     pt = tokenizers.pt.tokenize(pt)
-#     # Convert from ragged to dense, padding with zeros.
-#     pt = pt.to_tensor()
-
-#     en = tokenizers.en.tokenize(en)
-#     # Convert from ragged to dense, padding with zeros.
-#     en = en.to_tensor()
-#     return pt, en
