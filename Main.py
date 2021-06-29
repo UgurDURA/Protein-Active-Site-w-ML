@@ -29,51 +29,57 @@ import scipy as sp
 import matplotlib.pyplot as plt
 import tensorflow as tf
 import json
+import sqlite3
 from tensorflow.keras import layers
+
+con = sqlite3.connect('[DATA]/db/Enzymes.db')
+cur = con.cursor()
 
 logging.getLogger('tensorflow').setLevel(logging.ERROR)  # suppress warnings
 
+cur.execute('SELECT sequence_string, ec_number_string FROM Entries')
+
 
 dataset= pd.read_csv('[DATA]/DB/Entries.csv')  #taking data from csv file, you can easily export the data from SQL file to csv
-Ec_Number = dataset.iloc[:,2].values #features
-Sequence = dataset.iloc[:,-1].values  #Dependent values      #a better name could be suggested
+Ec_Number = list(dataset.iloc[:,2].values) #features
+Sequence = list(dataset.iloc[:,-1].values)  #Dependent values      #a better name could be suggested
 
 
-print(Ec_Number)
-print(Sequence)
+# print(Ec_Number)
+# print(Sequence)
 
 
 'Data Analysis'
  
-count_aminos={}
-length_seqs=[]
-for i, seq in enumerate(Sequence):
-    length_seqs.append(len(seq))
-    for a in seq:
-        if a in count_aminos:
-            count_aminos[a] += 1
-        else:
-            count_aminos[a] = 0
+# count_aminos={}
+# length_seqs=[]
+# for i, seq in enumerate(Sequence):
+#     length_seqs.append(len(seq))
+#     for a in seq:
+#         if a in count_aminos:
+#             count_aminos[a] += 1
+#         else:
+#             count_aminos[a] = 0
 
-unique_aminos=list(count_aminos.keys())
+# unique_aminos=list(count_aminos.keys())
 
-print('Unique aminos ({}):\n{}'.format(len(unique_aminos), unique_aminos))
-x=[i for i in range(len(unique_aminos))]
-plt.bar(x, count_aminos.values())
-plt.xticks(x, unique_aminos)
-print(list(count_aminos.values())[-5:])
-plt.show()
+# print('Unique aminos ({}):\n{}'.format(len(unique_aminos), unique_aminos))
+# x=[i for i in range(len(unique_aminos))]
+# plt.bar(x, count_aminos.values())
+# plt.xticks(x, unique_aminos)
+# print(list(count_aminos.values())[-5:])
+# plt.show()
 
 
-print('Average length:', np.mean(length_seqs))
-print('Deviation:', np.std(length_seqs))
-print('Min length:', np.min(length_seqs))
-print('Max length:', np.max(length_seqs))
+# print('Average length:', np.mean(length_seqs))
+# print('Deviation:', np.std(length_seqs))
+# print('Min length:', np.min(length_seqs))
+# print('Max length:', np.max(length_seqs))
 
-print('Average length:', np.mean(length_seqs))
-print('Deviation:', np.std(length_seqs))
-print('Min length:', np.min(length_seqs))
-print('Max length:', np.max(length_seqs))
+# print('Average length:', np.mean(length_seqs))
+# print('Deviation:', np.std(length_seqs))
+# print('Min length:', np.min(length_seqs))
+# print('Max length:', np.max(length_seqs))
 
 'Split dataset into test and validation'
 
@@ -90,33 +96,35 @@ Ec_Number_train,Ec_Number_test,Sequence_train,Sequence_test =train_test_split(Ec
 # print(Sequence_train)
 # print(Sequence_test)
 
-SequenceTestFile = open("SequenceTest.txt", "w")
-for element in Sequence_test:
-    SequenceTestFile.write(element + "\n")
-SequenceTestFile.close()
+#Data splitted into test and training and saved into a text files as mentioned below
 
-print('Sequence Test Data Created Succesfully....')
+# SequenceTestFile = open("SequenceTest.txt", "w")
+# for element in Sequence_test:
+#     SequenceTestFile.write(element + "\n")
+# SequenceTestFile.close()
 
-EcNumberTestFile = open("Ec_NumbersTest.txt", "w")
-for element in Ec_Number_test:
-    EcNumberTestFile.write(element + "\n")
-EcNumberTestFile.close()
+# print('Sequence Test Data Created Succesfully....')
 
-print('Ec Number Test Data Created Succesfully....')
+# EcNumberTestFile = open("Ec_NumbersTest.txt", "w")
+# for element in Ec_Number_test:
+#     EcNumberTestFile.write(element + "\n")
+# EcNumberTestFile.close()
 
-SequenceTrainingFile = open("SequencesTraining.txt", "w")
-for element in Sequence_train:
-    SequenceTrainingFile.write(element + "\n")
-SequenceTrainingFile.close()
+# print('Ec Number Test Data Created Succesfully....')
 
-print('Sequence Training Data Created Succesfully....')
+# SequenceTrainingFile = open("SequencesTraining.txt", "w")
+# for element in Sequence_train:
+#     SequenceTrainingFile.write(element + "\n")
+# SequenceTrainingFile.close()
 
-EcNumberTrainingFile = open("Ec_NumbersTraining.txt", "w")
-for element in Ec_Number_train:
-    EcNumberTrainingFile.write(element + "\n")
-EcNumberTrainingFile.close()
+# print('Sequence Training Data Created Succesfully....')
 
-print('Ec Number Training Data Created Succesfully....')
+# EcNumberTrainingFile = open("Ec_NumbersTraining.txt", "w")
+# for element in Ec_Number_train:
+#     EcNumberTrainingFile.write(element + "\n")
+# EcNumberTrainingFile.close()
+
+# print('Ec Number Training Data Created Succesfully....')
 # def applyMask(dirtyData, dirty_idxs):
 #     if (type(dirtyData)!=type(np.asarray([]))):
 #         dirtyData=np.asarray(dirtyData)
@@ -127,26 +135,68 @@ print('Ec Number Training Data Created Succesfully....')
 
 # #Tokenization 
 
-# path  = 'all.tab'
-# int_path = 'interact.json'
-# seq_path = 'pretraining_data.txt'
-# model_path = 'm_reviewed.model'
+from transformers import BertForMaskedLM, BertTokenizer 
+import re
 
-# def filter_seqs():
-# 	"""
-# 	Filter sequences by length
-# 	"""
-	
-# 	seq_ls = [seq for seq in dataset['sequence_string'] if len(seq)<1024]
-# 	with open(seq_path, 'w') as filehandle:
-# 		for listitem in seq_ls:
-# 			filehandle.write('%s\n' % listitem)
+model_name = BertForMaskedLM.from_pretrained("Rostlab/prot_bert")
+
+tokenizer = BertTokenizer.from_pretrained("Rostlab/prot_bert", do_lower_case=False )
+# tokenizers = tf.saved_model.load(model_name)
+
+# tokens = tokenizers.en.lookup(encoded)
+# print(tokens)
 
 
  
-# from transformer import BertForMaskedLM, BertTokenizer, pipeline
-# tokenizer = BertTokenizer.from_pretrained("Rostlab/prot_bert", do_lower_case=False )
-# model = BertForMaskedLM.from_pretrained("Rostlab/prot_bert")
-# unmasker = pipeline('fill-mask', model=model, tokenizer=tokenizer)
-# unmasker('D L I P T S S K L V V [MASK] D T S L Q V K K A F F A L V T')
+Result=[]
+
+for SequenceTokens in Sequence:
+
+
+
+    sequence_Example = re.sub(r"[UZOB]", "X", SequenceTokens)
+    encoded_input = tokenizer(sequence_Example, return_tensors='pt')
+    output = model_name(**encoded_input)
+    Result.append(output)
+
+    
+    
+
+
+
+TokenizedSequenceFile = open("TokenizedSequences.txt", "a")    
+for element in Result:
+
+    TokenizedSequenceFile.write(element + "\n")
+    TokenizedSequenceFile.close()
  
+
+
+
+
+
+#Setup input pipeline
+
+# def tokenize_pairs(Ec_NumberTraining, SequenceTraining):
+#     Sq =
+#     # Convert from ragged to dense, padding with zeros.
+#     pt = pt.to_tensor()
+
+#     en = tokenizers.en.tokenize(en)
+#     # Convert from ragged to dense, padding with zeros.
+#     en = en.to_tensor()
+#     return pt, en
+
+ 
+
+
+ 
+# def tokenize_pairs(Ec_Number_train, Sequence):
+#     pt = tokenizers.pt.tokenize(pt)
+#     # Convert from ragged to dense, padding with zeros.
+#     pt = pt.to_tensor()
+
+#     en = tokenizers.en.tokenize(en)
+#     # Convert from ragged to dense, padding with zeros.
+#     en = en.to_tensor()
+#     return pt, en
