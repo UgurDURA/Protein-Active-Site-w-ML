@@ -1,4 +1,6 @@
 
 *.db
+*.db*
 *.csv
 *.txt
+.vscode
