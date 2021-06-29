@@ -1,9 +1,7 @@
 
-#This file created for trial
-
+#This file is created for experimentation
 
 # To do list
-
 '1- DATA PREPROCESSING '
 ' 1.1 Access the Data'
 ' 1.2 Spit the data into features and depandents'
@@ -11,7 +9,6 @@
 '2- TOKENIZATION'
 ' 2.1 BPE Algorithym'
 ' 2.2 '
-
 
 import collections
 import logging
@@ -45,10 +42,6 @@ Ec_Number = list(dataset.iloc[:,2].values) #features
 Sequence = list(dataset.iloc[:,-1].values)  #Dependent values      #a better name could be suggested
 
 
-# print(Ec_Number)
-# print(Sequence)
-
-
 'Data Analysis'
  
 count_aminos={}
@@ -70,12 +63,6 @@ plt.xticks(x, unique_aminos)
 print(list(count_aminos.values())[-5:])
 plt.show()
 
-
-print('Average length:', np.mean(length_seqs))
-print('Deviation:', np.std(length_seqs))
-print('Min length:', np.min(length_seqs))
-print('Max length:', np.max(length_seqs))
-
 print('Average length:', np.mean(length_seqs))
 print('Deviation:', np.std(length_seqs))
 print('Min length:', np.min(length_seqs))
@@ -89,7 +76,6 @@ print('Max length:', np.max(length_seqs))
 from sklearn.model_selection import train_test_split
 
 Ec_Number_train,Ec_Number_test,Sequence_train,Sequence_test =train_test_split(Ec_Number,Sequence,test_size=0.2, random_state=1)
-
 
 # print(Ec_Number_train)
 # print(Ec_Number_test)
@@ -134,7 +120,6 @@ Ec_Number_train,Ec_Number_test,Sequence_train,Sequence_test =train_test_split(Ec
 #     return returnData
 
 
-
 "Tokenization "
 
 from transformers import BertForMaskedLM, BertTokenizer 
@@ -149,21 +134,13 @@ tokenizer = BertTokenizer.from_pretrained("Rostlab/prot_bert", do_lower_case=Fal
 # print(tokens)
 
 
- 
 Result=[]
 
 for SequenceTokens in Sequence:
-
-
-
     sequence_Example = re.sub(r"[UZOB]", "X", SequenceTokens)
     encoded_input = tokenizer(sequence_Example, return_tensors='pt')
     output = model_name(**encoded_input)
     Result.append(output)
-
-    
-    
-
 
 
 TokenizedSequenceFile = open("TokenizedSequences.txt", "a")    
@@ -172,9 +149,5 @@ for element in Result:
     TokenizedSequenceFile.write(element + "\n")
     TokenizedSequenceFile.close()
  
-
-
-
-
 
 #Setup input pipeline
