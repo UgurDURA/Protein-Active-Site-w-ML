@@ -1,20 +1,21 @@
 '''
 TODO: Transformer model tasks
->[check] input & output tokenization
+>[uncheck] input & output tokenization
 >[check] positional encoding
->[check] token embedding
+>[uncheck] token embedding - BPE or ready tokenizer of pretrained model?
 >[check] combine embeddings
->[check] test detokenization -> sequences_to_text()
+>[uncheck] test detokenization -> sequences_to_text()
 
-> [check] modify encoder block
-> [] classification layer(s) to fit output format - 4 tokens: 4 classifctn layers?
+> [] BERT/similar encoder block
+> [] classification layer(s): layer-by-layer hierarchical model
 > [] decide and implement evaluation criteria
 
 data preprocessing steps:
+> [] new bigger data - only sequences for MLM task?
 > [check] tokenizer training in separate script.
 > store tokenized data?
-> [] method to divide/save data as train-validtn
-
+> [] method to divide/save data as train-validation
+> [] divide entries based on ec number specificity (how many digits)
 
 https://keras.io/api/models/model_training_apis/
 https://keras.io/guides/serialization_and_saving/
