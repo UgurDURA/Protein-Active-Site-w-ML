@@ -2,6 +2,5 @@
 *.db
 *.db*
 *.csv
-*.txt
 .vscode
 __pycache__
