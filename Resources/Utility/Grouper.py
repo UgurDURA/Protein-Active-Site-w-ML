@@ -58,5 +58,3 @@ first two = '\d+\.\d+\.*'
 first three = '\d+\.\d+\.\d+\.*'
 all four = '\d+\.\d+\.\d+\.\d+'
 '''
-
-exit()
