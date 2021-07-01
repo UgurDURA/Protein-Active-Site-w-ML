@@ -1,6 +1,10 @@
 """
 scriptlet to save the autoID's of the entries into text files;
-named second, third and fourth, if they have the first two, three or all numbers in EC number notation respectively,
+named second.txt, third.txt and fourth.txt (stored in "EC Groupings" folder), if they have the first
+two, three or all numbers in EC number notation respectively,
+
+when going to use, read EnzymeAutoID's from the text file. each line is a new entry.
+after reading all into a list, divide into training/validation or just access entries from the database via EnzymeAutoID.
 """
 
 import sqlite3
