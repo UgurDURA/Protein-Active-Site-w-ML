@@ -4,3 +4,4 @@
 *.csv
 .vscode
 __pycache__
+*.txt
