@@ -14,9 +14,21 @@ dataset= pd.read_csv('[DATA]\DummyData\TestData.csv')  #taking data from csv fil
 EcNumberDataset = list(dataset.iloc[:,2].values)#features
 SequenceDataset = list(dataset.iloc[:,-1].values)  #Dependent values      #a better name could be suggested
 
+def addSpace(sequence):
+    iterable=sequence
+    separator = " " # A whitespace character.
+                # The string to which the method will be applied
+    return separator.join(iterable)
+
+
+
  
-# cur.execute(
-#     'CREATE TABLE EcNumber(EcNumberAutoID integer primary key autoincrement,EcNumber_Full str, EcNumber_First int, EcNumber_Second int,EcNumber_Third int,EcNumber_Fourth int)')
+cur.execute(
+    'CREATE TABLE EcNumber(EcNumberAutoID integer primary key autoincrement,AccessionNumber str key,EcNumber_Full str, EcNumber_First int, EcNumber_Second int,EcNumber_Third int,EcNumber_Fourth int)')
+
+
+cur.execute(
+    'CREATE TABLE Sequence(EcNumberAutoID integer primary key autoincrement,AccessionNumber str key, Sequence str, Sequence_Spaced str)')
 
 
 
@@ -38,11 +50,15 @@ for i in EcNumberDataset:
     Ec_Number_ThirdOnly.append(int(Seperated_EcNumber[2]))
     Ec_Number_FourthOnly.append(int(Seperated_EcNumber[3]))
 
-# for i in range(len(EcNumberDataset)):
-#     EcNumberDataset[i]=EcNumberDataset[i].replace("-","-1")
-#     cur.execute("INSERT INTO EcNumber(EcNumber_Full, EcNumber_First, EcNumber_Second, EcNumber_Third, EcNumber_Fourth) VALUES "
-#                     "('{0}','{1}','{2}','{3}','{4}')".format(EcNumberDataset[i],Ec_Number_FirstOnly[i],Ec_Number_SecondOnly[i],Ec_Number_ThirdOnly[i],Ec_Number_FourthOnly[i]))
-#     con.commit()
+for i in range(len(dataset)):
+    EcNumberDataset[i]=EcNumberDataset[i].replace("-","-1")
+    cur.execute("INSERT INTO EcNumber(AccessionNumber,EcNumber_Full, EcNumber_First, EcNumber_Second, EcNumber_Third, EcNumber_Fourth) VALUES "
+                    "('{0}','{1}','{2}','{3}','{4}','{5}')".format(dataset.iloc[i,1],EcNumberDataset[i],Ec_Number_FirstOnly[i],Ec_Number_SecondOnly[i],Ec_Number_ThirdOnly[i],Ec_Number_FourthOnly[i]))
+    con.commit()
+
+    cur.execute("INSERT INTO Sequence(AccessionNumber, Sequence, Sequence_Spaced) VALUES "
+                    "('{0}','{1}','{2}')".format(dataset.iloc[i,1],SequenceDataset[i],addSpace(SequenceDataset[i])))
+    con.commit()
 
 
 
