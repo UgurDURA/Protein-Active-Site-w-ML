@@ -11,13 +11,10 @@ cur = con.cursor()
 
 
 EcNumberDatasetSeperated=pd.read_csv('[DATA]\DB\EcNumber\EcNumber.csv')
-SequenceDatasetSpaced=pd.read_csv('[DATA]\DB\Sequence\Sequence.csv')     #a better name could be suggested
+SequenceDatasetSpaced=pd.read_csv('[DATA]\DB\Sequence\Sequence.csv')     
 
 
 'Split dataset into test and validation'
-
-#Important note for here, the split need to be performed after tokenization and embedding
-#I just added the code here 
 
 from sklearn.model_selection import train_test_split
 
@@ -44,61 +41,57 @@ con.commit()
 
 
 
-
-
-
-
-# def addSpace(sequence):
-#     iterable=sequence
-#     separator = " " # A whitespace character.
-#                 # The string to which the method will be applied
-#     return separator.join(iterable)
+def addSpace(sequence):
+    iterable=sequence
+    separator = " " # A whitespace character.
+                # The string to which the method will be applied
+    return separator.join(iterable)
 
 
 
  
-# cur.execute(
-#     'CREATE TABLE EcNumber(EcNumberAutoID integer primary key autoincrement,AccessionNumber str key,EcNumber_Full str, EcNumber_First int, EcNumber_Second int,EcNumber_Third int,EcNumber_Fourth int)')
+cur.execute(
+    'CREATE TABLE EcNumber(EcNumberAutoID integer primary key autoincrement,AccessionNumber str key,EcNumber_Full str, EcNumber_First int, EcNumber_Second int,EcNumber_Third int,EcNumber_Fourth int)')
 
 
-# cur.execute(
-#     'CREATE TABLE Sequence(EcNumberAutoID integer primary key autoincrement,AccessionNumber str key, Sequence str, Sequence_Spaced str)')
+cur.execute(
+    'CREATE TABLE Sequence(EcNumberAutoID integer primary key autoincrement,AccessionNumber str key, Sequence str, Sequence_Spaced str)')
 
 
 
-# Ec_Number_FirstOnly=[]
-# Ec_Number_SecondOnly=[]
-# Ec_Number_ThirdOnly=[]
-# Ec_Number_FourthOnly=[]
+Ec_Number_FirstOnly=[]
+Ec_Number_SecondOnly=[]
+Ec_Number_ThirdOnly=[]
+Ec_Number_FourthOnly=[]
  
 
-# for i in EcNumberDataset:
+for i in EcNumberDataset:
 
-#     i=i.replace("-","-1")
-#     print(i)
+    i=i.replace("-","-1")
+    print(i)
 
-#     Seperated_EcNumber= i.split('.')
+    Seperated_EcNumber= i.split('.')
 
-#     Ec_Number_FirstOnly.append(int(Seperated_EcNumber[0]))
-#     Ec_Number_SecondOnly.append(int(Seperated_EcNumber[1]))
-#     Ec_Number_ThirdOnly.append(int(Seperated_EcNumber[2]))
-#     Ec_Number_FourthOnly.append(int(Seperated_EcNumber[3]))
+    Ec_Number_FirstOnly.append(int(Seperated_EcNumber[0]))
+    Ec_Number_SecondOnly.append(int(Seperated_EcNumber[1]))
+    Ec_Number_ThirdOnly.append(int(Seperated_EcNumber[2]))
+    Ec_Number_FourthOnly.append(int(Seperated_EcNumber[3]))
 
-# for i in range(len(dataset)):
-#     EcNumberDataset[i]=EcNumberDataset[i].replace("-","-1")
-#     cur.execute("INSERT INTO EcNumber(AccessionNumber,EcNumber_Full, EcNumber_First, EcNumber_Second, EcNumber_Third, EcNumber_Fourth) VALUES "
-#                     "('{0}','{1}','{2}','{3}','{4}','{5}')".format(dataset.iloc[i,1],EcNumberDataset[i],Ec_Number_FirstOnly[i],Ec_Number_SecondOnly[i],Ec_Number_ThirdOnly[i],Ec_Number_FourthOnly[i]))
-#     con.commit()
+for i in range(len(dataset)):
+    EcNumberDataset[i]=EcNumberDataset[i].replace("-","-1")
+    cur.execute("INSERT INTO EcNumber(AccessionNumber,EcNumber_Full, EcNumber_First, EcNumber_Second, EcNumber_Third, EcNumber_Fourth) VALUES "
+                    "('{0}','{1}','{2}','{3}','{4}','{5}')".format(dataset.iloc[i,1],EcNumberDataset[i],Ec_Number_FirstOnly[i],Ec_Number_SecondOnly[i],Ec_Number_ThirdOnly[i],Ec_Number_FourthOnly[i]))
+    con.commit()
 
-#     cur.execute("INSERT INTO Sequence(AccessionNumber, Sequence, Sequence_Spaced) VALUES "
-#                     "('{0}','{1}','{2}')".format(dataset.iloc[i,1],SequenceDataset[i],addSpace(SequenceDataset[i])))
-#     con.commit()
-
-
+    cur.execute("INSERT INTO Sequence(AccessionNumber, Sequence, Sequence_Spaced) VALUES "
+                    "('{0}','{1}','{2}')".format(dataset.iloc[i,1],SequenceDataset[i],addSpace(SequenceDataset[i])))
+    con.commit()
 
 
 
-# print(Ec_Number_FirstOnly)
-# print(Ec_Number_SecondOnly)
-# print(Ec_Number_ThirdOnly)
-# print(Ec_Number_FourthOnly)
+
+
+print(Ec_Number_FirstOnly)
+print(Ec_Number_SecondOnly)
+print(Ec_Number_ThirdOnly)
+print(Ec_Number_FourthOnly)
