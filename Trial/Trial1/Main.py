@@ -41,7 +41,8 @@ dataset= pd.read_csv('[DATA]\DummyData\TestData.csv')  #taking data from csv fil
 EcNumberDataset = list(dataset.iloc[:,2].values)#features
 SequenceDataset = list(dataset.iloc[:,-1].values)  #Dependent values      #a better name could be suggested
 
-
+EcNumberDatasetSeperated=pd.read_csv('[DATA]\DB\EcNumber\EcNumber.csv')
+SequenceDatasetSpaced=pd.read_csv('[DATA]\DB\Sequence\Sequence.csv')
 
 'Data Analysis'
 
@@ -179,49 +180,9 @@ plt.show()
 
 from sklearn.model_selection import train_test_split
 
-Ec_Number_train,Ec_Number_test,Sequence_train,Sequence_test =train_test_split(Ec_Number_FirstOnly,SequenceDataset,test_size=0.2, random_state=1)
+Ec_Number_train,Ec_Number_test,Sequence_train,Sequence_test =train_test_split(EcNumberDatasetSeperated.iloc[:,3],SequenceDatasetSpaced.iloc[:,3],test_size=0.2, random_state=1)
 
-# print(Ec_Number_train)
-# print(Ec_Number_test)
-# print(Sequence_train)
-# print(Sequence_test)
 
-#Data splitted into test and training and saved into a text files as mentioned below
-
-# SequenceTestFile = open("SequenceTest.txt", "w")
-# for element in Sequence_test:
-#     SequenceTestFile.write(element + "\n")
-# SequenceTestFile.close()
-
-# print('Sequence Test Data Created Succesfully....')
-
-# EcNumberTestFile = open("Ec_NumbersTest.txt", "w")
-# for element in Ec_Number_test:
-#     EcNumberTestFile.write(element + "\n")
-# EcNumberTestFile.close()
-
-# print('Ec Number Test Data Created Succesfully....')
-
-# SequenceTrainingFile = open("SequencesTraining.txt", "w")
-# for element in Sequence_train:
-#     SequenceTrainingFile.write(element + "\n")
-# SequenceTrainingFile.close()
-
-# print('Sequence Training Data Created Succesfully....')
-
-# EcNumberTrainingFile = open("Ec_NumbersTraining.txt", "w")
-# for element in Ec_Number_train:
-#     EcNumberTrainingFile.write(element + "\n")
-# EcNumberTrainingFile.close()
-
-# print('Ec Number Training Data Created Succesfully....')
-# def applyMask(dirtyData, dirty_idxs):
-#     if (type(dirtyData)!=type(np.asarray([]))):
-#         dirtyData=np.asarray(dirtyData)
-
-#     returnData= dirtyData[np.logical_not(dirty_idxs)]
-
-#     return returnData
 
 
 "Tokenization "
