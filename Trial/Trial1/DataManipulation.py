@@ -18,26 +18,31 @@ SequenceDatasetSpaced=pd.read_csv('[DATA]\DB\Sequence\Sequence.csv')
 
 from sklearn.model_selection import train_test_split
 
-Ec_Number_train,Ec_Number_test,Sequence_train,Sequence_test =train_test_split(EcNumberDatasetSeperated.iloc[:,3],SequenceDatasetSpaced.iloc[:,3],test_size=0.2, random_state=1)
+Ec_Number_train,Ec_Number_test,Sequence_train,Sequence_test =train_test_split(list(EcNumberDatasetSeperated.iloc[:,3]),list(SequenceDatasetSpaced.iloc[:,3]),test_size=0.2, random_state=1)
  
 cur.execute(
     'CREATE TABLE TrainDataset(TrainAutoID integer primary key autoincrement,Sequence_Train str, EcNumber_Train int)')
-print(Ec_Number_train)
-
-
-cur.execute("INSERT INTO TrainDataset(Sequence_Train, EcNumber_Train) VALUES "
-                    "('{0}', '{1}')".format(Sequence_train,Ec_Number_train))
 
 
 cur.execute(
     'CREATE TABLE TestDataset(TestID integer primary key autoincrement,Sequence_Test str, EcNumber_Test int)')
 
-print(Ec_Number_test)
-cur.execute("INSERT INTO TestDataset(Sequence_Test,EcNumber_Test) VALUES "
-                    "('{0}', '{1}')".format(Sequence_test,Ec_Number_test))
+
+for i in range(len(Ec_Number_train)):
+
+    cur.execute("INSERT INTO TrainDataset(Sequence_Train, EcNumber_Train) VALUES "
+                    "('{0}', '{1}')".format(Sequence_train[i],Ec_Number_train[i]))
+    print(Ec_Number_train[i])
+
+
+for i in range(len(Ec_Number_test)):
+    cur.execute("INSERT INTO TestDataset(Sequence_Test,EcNumber_Test) VALUES "
+                    "('{0}', '{1}')".format(Sequence_test[i],Ec_Number_test[i]))
+    print(Ec_Number_test[i])
+
+
 
 con.commit()
-
 
 
 

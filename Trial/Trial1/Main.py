@@ -38,19 +38,22 @@ logging.getLogger('tensorflow').setLevel(logging.ERROR)  # suppress warnings
 
 
 dataset= pd.read_csv('[DATA]\DummyData\TestData.csv')  #taking data from csv file, you can easily export the data from SQL file to csv
-EcNumberDataset = list(dataset.iloc[:,2].values)#features
-SequenceDataset = list(dataset.iloc[:,-1].values)  #Dependent values      #a better name could be suggested
 
-EcNumberDatasetSeperated=pd.read_csv('[DATA]\DB\EcNumber\EcNumber.csv')
-SequenceDatasetSpaced=pd.read_csv('[DATA]\DB\Sequence\Sequence.csv')
+TraininDataset=pd.read_csv('[DATA]\TrainingData\TrainDataset.csv') 
+
+EcNumberDataset =list(TraininDataset.iloc[:,1])#features
+SequenceDataset =list(TraininDataset.iloc[:,2])   #Dependent values  
+
+print(EcNumberDataset)
+print(SequenceDataset)
 
 'Data Analysis'
 
 count_aminos={}
-SequenceSize=len(SequenceDataset)
+SequenceSize=len(dataset.iloc[:,-1])
 
 length_seqs=[]
-for i, seq in enumerate(SequenceDataset):
+for i, seq in enumerate(dataset.iloc[:,-1]):
     length_seqs.append(len(seq))
     for a in seq:
         if a in count_aminos:
@@ -169,35 +172,15 @@ plt.title('Sequence Length Distribution')
 # Show plot
 plt.show()
 
- 
- 
-    
-
-'Split dataset into test and validation'
-
-#Important note for here, the split need to be performed after tokenization and embedding
-#I just added the code here 
-
-from sklearn.model_selection import train_test_split
-
-Ec_Number_train,Ec_Number_test,Sequence_train,Sequence_test =train_test_split(EcNumberDatasetSeperated.iloc[:,3],SequenceDatasetSpaced.iloc[:,3],test_size=0.2, random_state=1)
-
 
 
 
 "Tokenization "
-def addSpace(sequence):
-    iterable=sequence
-    separator = " " # A whitespace character.
-                # The string to which the method will be applied
-    return separator.join(iterable)
-
-
-    
+ 
 Sequence_Example=SequenceDataset[1]
 Ec_NumberExample=EcNumberDataset[1]
 
-print('Example Sequence:    ',addSpace(Sequence_Example), " Example EC number:  ",EC_First(Ec_NumberExample))
+print('Example Sequence:    ',Sequence_Example, " Example EC number:  ",Ec_NumberExample)
 
 
 from transformers import BertTokenizer 
@@ -208,7 +191,7 @@ MAX_LEN=512
 
 
 tokenizer = BertTokenizer.from_pretrained('Rostlab/prot_bert_bfd_localization', do_lower_case=False, )
-tokens=tokenizer.encode_plus(addSpace(Sequence_Example), max_length=MAX_LEN,truncation=True,padding="max_length",
+tokens=tokenizer.encode_plus(Sequence_Example, max_length=MAX_LEN,truncation=True,padding="max_length",
                                 add_special_tokens=True,return_token_type_ids=False,return_attention_mask=True, return_tensors='tf')
 
 print(tokens)
@@ -224,7 +207,7 @@ print(Xids.shape)
 
 
 for i, sequence in enumerate (dataset['sequence_string']):
-    tokens=tokenizer.encode_plus(addSpace(sequence), max_length=MAX_LEN,truncation=True,padding="max_length",
+    tokens=tokenizer.encode_plus(sequence, max_length=MAX_LEN,truncation=True,padding="max_length",
                                 add_special_tokens=True,return_token_type_ids=False,return_attention_mask=True, return_tensors='tf')
     
     Xids[i,:], Xmask[i,:]= tokens['input_ids'], tokens['attention_mask']
@@ -233,9 +216,9 @@ print(Xids)
 print(Xmask)
 
 
-print(Ec_Number_FirstOnly)
+ 
 
-arr=Ec_Number_FirstOnly
+arr=EcNumberDataset
 
 labels=np.zeros((arr.size,arr.max()+1))
 
@@ -244,30 +227,6 @@ print(labels.shape)
 
 
 
-
-# tokens = tokenizers.en.lookup(encoded)
-# print(tokens)
-
-
-# SequenceDataset=np.array(SequenceDataset)
-
-# Result=[]
-
-# for SequenceTokens in SequenceDataset:
-
-
-
-#     sequence_Example = re.sub(r"[UZOB]", "X", SequenceTokens)
-#     encoded_input = tokenizer(sequence_Example, return_tensors='pt')
-#     output = model_name(**encoded_input)
-#     print(output)
-    
-
-
-# print(Result)
-
-
-#Setup input pipeline
 
 
 
