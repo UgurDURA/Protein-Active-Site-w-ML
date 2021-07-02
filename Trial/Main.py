@@ -26,20 +26,20 @@ import pandas as pd
 import scipy as sp
 # import sentencepiece as spm
 import matplotlib.pyplot as plt
+import seaborn as sns
 import tensorflow as tf
 import json
 import sqlite3
 from tensorflow.keras import layers
 
-con = sqlite3.connect('[DATA]/db/Enzymes.db')
-cur = con.cursor()
-
+ 
+ 
 logging.getLogger('tensorflow').setLevel(logging.ERROR)  # suppress warnings
 
-cur.execute('SELECT sequence_string, ec_number_string FROM Entries')
+ 
 
 
-dataset= pd.read_csv('[DATA]\DB\Entries.csv')  #taking data from csv file, you can easily export the data from SQL file to csv
+dataset= pd.read_csv('[DATA]\DummyData\TestData.csv')  #taking data from csv file, you can easily export the data from SQL file to csv
 EcNumberDataset = list(dataset.iloc[:,2].values) #features
 SequenceDataset = list(dataset.iloc[:,-1].values)  #Dependent values      #a better name could be suggested
 
@@ -170,6 +170,7 @@ plt.title('Sequence Length Distribution')
 plt.show()
 
  
+ 
     
 
 'Split dataset into test and validation'
@@ -226,13 +227,28 @@ Ec_Number_train,Ec_Number_test,Sequence_train,Sequence_test =train_test_split(Ec
 
 "Tokenization "
 
-from transformers import BertForMaskedLM, BertTokenizer 
-import re
+Sequence_Example=SequenceDataset[1]
+Ec_NumberExample=EcNumberDataset[1]
 
-model_name = BertForMaskedLM.from_pretrained("Rostlab/prot_bert")
+print('Example Sequence:    ',Sequence_Example, "/n Example EC number:  ",Ec_NumberExample)
 
-tokenizer = BertTokenizer.from_pretrained("Rostlab/prot_bert", do_lower_case=False )
-# tokenizers = tf.saved_model.load(model_name)
+
+from transformers import BertTokenizer 
+
+MAX_LEN=512
+
+tokenizer = BertTokenizer.from_pretrained('Rostlab/prot_bert_bfd_localization', do_lower_case=False )
+tokens=tokenizer.encode_plus("M N L Q R F P R Y P L T F G P T P I Q P L K R L S A H L ", max_length=MAX_LEN,truncation=True,padding="max_length",
+                                add_special_tokens=True,return_token_type_ids=False,return_attention_mask=True, return_tensors='tf')
+
+print(tokens)
+
+
+Xids= np.zeros((len(dataset),MAX_LEN))
+Xmask= np.zeros((len(dataset),MAX_LEN))
+
+print(Xids.shape)
+
 
 # tokens = tokenizers.en.lookup(encoded)
 # print(tokens)
@@ -240,20 +256,20 @@ tokenizer = BertTokenizer.from_pretrained("Rostlab/prot_bert", do_lower_case=Fal
 
 # SequenceDataset=np.array(SequenceDataset)
 
-Result=[]
+# Result=[]
 
-for SequenceTokens in SequenceDataset:
+# for SequenceTokens in SequenceDataset:
 
 
 
-    sequence_Example = re.sub(r"[UZOB]", "X", SequenceTokens)
-    encoded_input = tokenizer(sequence_Example, return_tensors='pt')
-    output = model_name(**encoded_input)
-    print(output)
+#     sequence_Example = re.sub(r"[UZOB]", "X", SequenceTokens)
+#     encoded_input = tokenizer(sequence_Example, return_tensors='pt')
+#     output = model_name(**encoded_input)
+#     print(output)
     
 
 
-print(Result)
+# print(Result)
 
 
 #Setup input pipeline
