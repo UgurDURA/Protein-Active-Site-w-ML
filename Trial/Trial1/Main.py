@@ -36,12 +36,11 @@ from tensorflow.keras import layers
  
 logging.getLogger('tensorflow').setLevel(logging.ERROR)  # suppress warnings
 
- 
-
 
 dataset= pd.read_csv('[DATA]\DummyData\TestData.csv')  #taking data from csv file, you can easily export the data from SQL file to csv
-EcNumberDataset = list(dataset.iloc[:,2].values) #features
+EcNumberDataset = list(dataset.iloc[:,2].values)#features
 SequenceDataset = list(dataset.iloc[:,-1].values)  #Dependent values      #a better name could be suggested
+
 
 
 'Data Analysis'
@@ -180,7 +179,7 @@ plt.show()
 
 from sklearn.model_selection import train_test_split
 
-Ec_Number_train,Ec_Number_test,Sequence_train,Sequence_test =train_test_split(EcNumberDataset,SequenceDataset,test_size=0.2, random_state=1)
+Ec_Number_train,Ec_Number_test,Sequence_train,Sequence_test =train_test_split(Ec_Number_FirstOnly,SequenceDataset,test_size=0.2, random_state=1)
 
 # print(Ec_Number_train)
 # print(Ec_Number_test)
@@ -226,19 +225,29 @@ Ec_Number_train,Ec_Number_test,Sequence_train,Sequence_test =train_test_split(Ec
 
 
 "Tokenization "
+def addSpace(sequence):
+    iterable=sequence
+    separator = " " # A whitespace character.
+                # The string to which the method will be applied
+    return separator.join(iterable)
 
+
+    
 Sequence_Example=SequenceDataset[1]
 Ec_NumberExample=EcNumberDataset[1]
 
-print('Example Sequence:    ',Sequence_Example, "/n Example EC number:  ",Ec_NumberExample)
+print('Example Sequence:    ',addSpace(Sequence_Example), " Example EC number:  ",EC_First(Ec_NumberExample))
 
 
 from transformers import BertTokenizer 
 
 MAX_LEN=512
 
-tokenizer = BertTokenizer.from_pretrained('Rostlab/prot_bert_bfd_localization', do_lower_case=False )
-tokens=tokenizer.encode_plus("M N L Q R F P R Y P L T F G P T P I Q P L K R L S A H L ", max_length=MAX_LEN,truncation=True,padding="max_length",
+
+
+
+tokenizer = BertTokenizer.from_pretrained('Rostlab/prot_bert_bfd_localization', do_lower_case=False, )
+tokens=tokenizer.encode_plus(addSpace(Sequence_Example), max_length=MAX_LEN,truncation=True,padding="max_length",
                                 add_special_tokens=True,return_token_type_ids=False,return_attention_mask=True, return_tensors='tf')
 
 print(tokens)
@@ -248,6 +257,31 @@ Xids= np.zeros((len(dataset),MAX_LEN))
 Xmask= np.zeros((len(dataset),MAX_LEN))
 
 print(Xids.shape)
+
+
+
+
+
+for i, sequence in enumerate (dataset['sequence_string']):
+    tokens=tokenizer.encode_plus(addSpace(sequence), max_length=MAX_LEN,truncation=True,padding="max_length",
+                                add_special_tokens=True,return_token_type_ids=False,return_attention_mask=True, return_tensors='tf')
+    
+    Xids[i,:], Xmask[i,:]= tokens['input_ids'], tokens['attention_mask']
+
+print(Xids)
+print(Xmask)
+
+
+print(Ec_Number_FirstOnly)
+
+arr=Ec_Number_FirstOnly
+
+labels=np.zeros((arr.size,arr.max()+1))
+
+print(labels.shape)
+
+
+
 
 
 # tokens = tokenizers.en.lookup(encoded)
