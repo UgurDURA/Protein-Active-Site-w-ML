@@ -47,7 +47,7 @@ dataset= pd.read_csv('[DATA]\DB\MainDataset\MainDataset.csv')  #taking data from
 
 TraininDataset=pd.read_csv('[DATA]\TrainingData\TrainDataset.csv') 
 
-EcNumberDataset =list(dataset.iloc[:,4])#features
+EcNumberDataset =list(dataset.iloc[:,4])   #features
 SequenceDataset =list(dataset.iloc[:,5])   #Dependent values  
 
 
@@ -182,7 +182,7 @@ SequenceDataset =list(dataset.iloc[:,5])   #Dependent values
 
 
 
-"Tokenization "
+# "Tokenization "
  
 Sequence_Example=SequenceDataset[1]
 Ec_NumberExample=EcNumberDataset[1]
@@ -190,14 +190,13 @@ Ec_NumberExample=EcNumberDataset[1]
 print('Example Sequence:    ',Sequence_Example, " Example EC number:  ",Ec_NumberExample)
 
 
-from transformers import BertTokenizer 
+from transformers import AutoTokenizer 
 
 MAX_LEN=512
 
 
 
-
-tokenizer = BertTokenizer.from_pretrained('Rostlab/prot_bert_bfd_localization', do_lower_case=False, )
+tokenizer = AutoTokenizer.from_pretrained('Rostlab/prot_bert_bfd', do_lower_case=False, )
 tokens=tokenizer.encode_plus(Sequence_Example, max_length=MAX_LEN,truncation=True,padding="max_length",
                                 add_special_tokens=True,return_token_type_ids=False,return_attention_mask=True, return_tensors='tf')
 
@@ -216,25 +215,28 @@ print(Xids.shape)
 
 
 
+
 for i, sequence in enumerate (dataset.iloc[:,5]):
     tokens=tokenizer.encode_plus(sequence, max_length=MAX_LEN,truncation=True,padding="max_length",
                                 add_special_tokens=True,return_token_type_ids=False,return_attention_mask=True, return_tensors='tf')
     
     Xids[i,:], Xmask[i,:]= tokens['input_ids'], tokens['attention_mask']
+
+
 print("XIDS")
-print(Xids)
+print(type(Xids))
 print("XMASKS")
 print(Xmask)
 
 
-print(dataset.iloc[:,4].unique)
+print(dataset['ECNumber'].unique)
 
-arr=dataset.iloc[:,4].values
+arr=dataset['ECNumber'].values
 
 print("Array Size")
 print(arr.size)
 
-labels=np.zeros((arr.size,arr.max()+1))
+labels=np.zeros((arr.size, arr.max()+1))
 
 print("Labels Shape")
 print(labels.shape)
@@ -245,15 +247,28 @@ print("LABELS")
 print(labels)
 
 
-#Below code is for off loading the data
+# Below code is for off loading the data
 
-# with open('xids.npy','wb') as f:
-#     np.save(f,Xids)
-# with open('xmask.npy','wb') as f:
-#     np.save(f,Xmask)
-# with open('labels.npy','wb') as f:
-#     np.save(f,labels)
-# del df,Xids,Xmask,labels
+with open('xids.npy','wb') as f:
+    np.save(f,Xids)
+with open('xmask.npy','wb') as f:
+    np.save(f,Xmask)
+with open('labels.npy','wb') as f:
+    np.save(f,labels)
+
+
+
+#Below code is for load the data
+
+# with open('xids.npy','rb') as fp:
+#     Xids=np.load(fp)
+
+# with open('xmask.npy','rb') as fp:
+#     Xmask=np.load(fp)
+
+# with open('labels.npy','rb') as fp:
+#     labels=np.load(fp)
+
 
 tf.config.experimental.list_physical_devices('GPU')
 
@@ -264,8 +279,8 @@ for i in tensorflow_dataset.take(1):
     print(i)
 
 
-def map_func(input_ids,masks,labels):
-    return{'input_ids':input_ids,'attention mask':masks},labels
+def map_func(input_ids, masks, labels):
+    return{'input_ids': input_ids,'attention_mask': masks},labels
 
 
 tensorflow_dataset=tensorflow_dataset.map(map_func)
@@ -274,7 +289,7 @@ for i in tensorflow_dataset.take(1):
     print(i)
 
 
-tensorflow_dataset=tensorflow_dataset.shuffle(1000000).batch(32)
+tensorflow_dataset=tensorflow_dataset.shuffle(100000).batch(32)
 
 DS_LEN=len(list(tensorflow_dataset))
 
@@ -282,17 +297,18 @@ print(DS_LEN)
 
 SPLIT=.9
 
-train= tensorflow_dataset.take(round(DS_LEN=SPLIT))
-val=tensorflow_dataset.skip(round(DS_LEN=SPLIT))
+train= tensorflow_dataset.take(round(DS_LEN*SPLIT))
+val=tensorflow_dataset.skip(round(DS_LEN*SPLIT))
 
 del tensorflow_dataset
 
 from transformers import TFAutoModel
+from tensorflow import keras
 
-bert= TFAutoModel.from_pretrained('Rostlab/prot_bert_bfd_localization')
+bert= TFAutoModel.from_pretrained('Rostlab/prot_bert_bfd')
 
-input_ids=tf.keras.layers.Input(shape=(MAX_LEN),name='input_ids', dtype='int32')
-mask=tf.keras.layers.Input(shape=(MAX_LEN),name='attention_mask', dtype='int32')
+input_ids=tf.keras.layers.Input(shape=(MAX_LEN,),name='input_ids', dtype='int32')
+mask=tf.keras.layers.Input(shape=(MAX_LEN,),name='attention_mask', dtype='int32')
 
 embeddings=bert(input_ids, attention_mask=mask)[0]
 
@@ -302,14 +318,14 @@ X=tf.keras.layers.BatchNormalization()(X)
 X=tf.keras.layers.Dense(128,activation='relu')(X)
 X=tf.keras.layers.Dropout(0.1)(X)
 X=tf.keras.layers.Dense(32,activation='relu')(X)
-X=tf.keras.layers.Dense(7,activation='softmax', name='outputs')(X)
+y=tf.keras.layers.Dense(8,activation='softmax', name='outputs')(X)
 
 
-model= tf.keras.Model(intputs=[input_ids, mask], outputs=y)
+model= tf.keras.Model(inputs=[input_ids, mask], outputs=[y])
 
 model.summary()
 
-optimizer= tf.keras.optimizer.Adam(0.01)
+optimizer= tf.keras.optimizers.Adam(0.01)
 loss= tf.keras.losses.CategoricalCrossentropy()
 acc= tf.keras.metrics.CategoricalAccuracy('accuracy')
 

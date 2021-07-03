@@ -91,7 +91,7 @@ con.commit()
 
 # for i in EcNumberDataset:
 
-#     i=i.replace("-","-1")
+#     i=i.replace("-","0")
 #     i=i.replace("n","")
 #     print(i)
 
@@ -103,11 +103,10 @@ con.commit()
 #     Ec_Number_FourthOnly.append(int(Seperated_EcNumber[3]))
 
 # for i in range(len(dataset)):
-#     EcNumberDataset[i]=EcNumberDataset[i].replace("-","-1")
+#     EcNumberDataset[i]=EcNumberDataset[i].replace("-","0")
 #     cur.execute("INSERT INTO EcNumber(AccessionNumber,EcNumber_Full, EcNumber_First, EcNumber_Second, EcNumber_Third, EcNumber_Fourth) VALUES "
 #                     "('{0}','{1}','{2}','{3}','{4}','{5}')".format(dataset.iloc[i,1],EcNumberDataset[i],Ec_Number_FirstOnly[i],Ec_Number_SecondOnly[i],Ec_Number_ThirdOnly[i],Ec_Number_FourthOnly[i]))
-#     con.commit()
-
+   
 #     cur.execute("INSERT INTO Sequence(AccessionNumber, Sequence, Sequence_Spaced) VALUES "
 #                     "('{0}','{1}','{2}')".format(dataset.iloc[i,1],SequenceDataset[i],addSpace(SequenceDataset[i])))
 #     con.commit()
