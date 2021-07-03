@@ -1,25 +1,22 @@
 import sqlite3
-import numpy as np
-from numpy.lib.shape_base import split
 import pandas as pd
 
 
 con = sqlite3.connect('[DATA]/db/Enzymes.db')
 cur = con.cursor()
- 
 
 
-dataset= pd.read_csv('[DATA]\DB\Entries.csv')
-EcNumberDataset =list(dataset.iloc[:,2])#features
-SequenceDataset =list(dataset.iloc[:,4])  #Dependent values  
+dataset = pd.read_csv('[DATA]\DB\Entries.csv')
+EcNumberDataset = list(dataset.iloc[:,2])   #features
+SequenceDataset = list(dataset.iloc[:,4])   #Dependent values
 
 print(EcNumberDataset[1])
 print(SequenceDataset[1])
 print(len(dataset))
 
 
-EcNumberDatasetSeperated=pd.read_csv('[DATA]\DB\MainDataset\EcNumber.csv')
-SequenceDatasetSpaced=pd.read_csv('[DATA]\DB\MainDataset\Sequence.csv')     
+EcNumberDatasetSeperated = pd.read_csv('[DATA]\DB\MainDataset\EcNumber.csv')
+SequenceDatasetSpaced = pd.read_csv('[DATA]\DB\MainDataset\Sequence.csv')
 
 cur.execute(
     'CREATE TABLE MainDataset(AutoID integer primary key autoincrement, AccessionNumber str, EcNumberID int, SequenceID int, ECNumber int, Sequence str)')
@@ -28,7 +25,8 @@ cur.execute(
 for i in range(len(dataset)):
 
     cur.execute("INSERT INTO MainDataset(AccessionNumber,EcNumberID,SequenceID,ECNUmber,Sequence) VALUES "
-                    "('{0}', '{1}','{2}', '{3}','{4}')".format(EcNumberDatasetSeperated.iloc[i, 1],i,i,EcNumberDatasetSeperated.iloc[i, 3],SequenceDatasetSpaced.iloc[i, 3]))
+                    "('{0}', '{1}','{2}', '{3}','{4}')".format(EcNumberDatasetSeperated.iloc[i, 1], i, i, EcNumberDatasetSeperated.iloc[i, 3],
+                                                               SequenceDatasetSpaced.iloc[i, 3]))
                     
 con.commit()    
 
