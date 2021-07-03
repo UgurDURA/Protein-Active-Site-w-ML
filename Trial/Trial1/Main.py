@@ -19,15 +19,8 @@ logging.getLogger('tensorflow').setLevel(logging.ERROR)  # suppress warnings
 
 dataset = pd.read_csv('[DATA]\DB\MainDataset\MainDataset.csv')  # taking data from csv file, you can easily export the data from SQL file to csv
 
-<<<<<<< HEAD
 EcNumberDataset =list(dataset.iloc[:,4])   #features
 SequenceDataset =list(dataset.iloc[:,5])   #Dependent values  
-=======
-TrainingDataset = pd.read_csv('[DATA]\TrainingData\TrainDataset.csv')
->>>>>>> 74cb52a06485cf7b047cd604ff2dc9f5d51a7da8
-
-EcNumberDataset = list(dataset.iloc[:, 4])  # features
-SequenceDataset = list(dataset.iloc[:, 5])  # Dependent values
 
 # print(EcNumberDataset)
 # print(SequenceDataset)
@@ -157,7 +150,6 @@ SequenceDataset = list(dataset.iloc[:, 5])  # Dependent values
 # plt.show()
 
 
-<<<<<<< HEAD
 
 
 # "Tokenization "
@@ -171,27 +163,16 @@ print('Example Sequence:    ',Sequence_Example, " Example EC number:  ",Ec_Numbe
 from transformers import AutoTokenizer 
 
 MAX_LEN=512
-=======
-"Tokenization "
->>>>>>> 74cb52a06485cf7b047cd604ff2dc9f5d51a7da8
 
 Sequence_Example = SequenceDataset[1]
 Ec_NumberExample = EcNumberDataset[1]
 
 print('Example Sequence:    ', Sequence_Example, " Example EC number:  ", Ec_NumberExample)
 
-<<<<<<< HEAD
 tokenizer = AutoTokenizer.from_pretrained('Rostlab/prot_bert_bfd', do_lower_case=False, )
 tokens=tokenizer.encode_plus(Sequence_Example, max_length=MAX_LEN,truncation=True,padding="max_length",
                                 add_special_tokens=True,return_token_type_ids=False,return_attention_mask=True, return_tensors='tf')
 
-=======
-MAX_LEN = 512
-
-tokenizer = BertTokenizer.from_pretrained('Rostlab/prot_bert_bfd_localization', do_lower_case=False, )
-tokens = tokenizer.encode_plus(Sequence_Example, max_length=MAX_LEN, truncation=True, padding="max_length",
-                               add_special_tokens=True, return_token_type_ids=False, return_attention_mask=True, return_tensors='tf')
->>>>>>> 74cb52a06485cf7b047cd604ff2dc9f5d51a7da8
 
 print("TOKENS")
 print(tokens)
@@ -206,7 +187,6 @@ for i, sequence in enumerate(dataset.iloc[:, 5]):
     tokens = tokenizer.encode_plus(sequence, max_length=MAX_LEN, truncation=True, padding="max_length",
                                    add_special_tokens=True, return_token_type_ids=False, return_attention_mask=True, return_tensors='tf')
 
-<<<<<<< HEAD
 
 
 
@@ -218,9 +198,6 @@ for i, sequence in enumerate (dataset.iloc[:,5]):
     Xids[i,:], Xmask[i,:]= tokens['input_ids'], tokens['attention_mask']
 
 
-=======
-    Xids[i, :], Xmask[i, :] = tokens['input_ids'], tokens['attention_mask']
->>>>>>> 74cb52a06485cf7b047cd604ff2dc9f5d51a7da8
 print("XIDS")
 print(type(Xids))
 print("XMASKS")
@@ -228,22 +205,14 @@ print(Xmask)
 
 print(dataset.iloc[:, 4].unique)
 
-<<<<<<< HEAD
 print(dataset['ECNumber'].unique)
 
 arr=dataset['ECNumber'].values
-=======
-arr = dataset.iloc[:, 4].values
->>>>>>> 74cb52a06485cf7b047cd604ff2dc9f5d51a7da8
 
 print("Array Size")
 print(arr.size)
 
-<<<<<<< HEAD
-labels=np.zeros((arr.size, arr.max()+1))
-=======
 labels = np.zeros((arr.size, arr.max() + 1))
->>>>>>> 74cb52a06485cf7b047cd604ff2dc9f5d51a7da8
 
 print("Labels Shape")
 print(labels.shape)
@@ -253,7 +222,6 @@ labels[np.arange(arr.size), arr] = 1
 print("LABELS")
 print(labels)
 
-<<<<<<< HEAD
 
 # Below code is for off loading the data
 
@@ -276,9 +244,6 @@ with open('labels.npy','wb') as f:
 
 # with open('labels.npy','rb') as fp:
 #     labels=np.load(fp)
-=======
-# Below code is for off loading the data
->>>>>>> 74cb52a06485cf7b047cd604ff2dc9f5d51a7da8
 
 
 tf.config.experimental.list_physical_devices('GPU')
@@ -291,11 +256,7 @@ for i in tensorflow_dataset.take(1):
 
 
 def map_func(input_ids, masks, labels):
-<<<<<<< HEAD
     return{'input_ids': input_ids,'attention_mask': masks},labels
-=======
-    return {'input_ids': input_ids, 'attention mask': masks}, labels
->>>>>>> 74cb52a06485cf7b047cd604ff2dc9f5d51a7da8
 
 
 tensorflow_dataset = tensorflow_dataset.map(map_func)
@@ -305,46 +266,32 @@ for i in tensorflow_dataset.take(1):
 
 tensorflow_dataset = tensorflow_dataset.shuffle(1000000).batch(32)
 
-<<<<<<< HEAD
 tensorflow_dataset=tensorflow_dataset.shuffle(100000).batch(32)
 
 DS_LEN=len(list(tensorflow_dataset))
-=======
-DS_LEN = len(list(tensorflow_dataset))
->>>>>>> 74cb52a06485cf7b047cd604ff2dc9f5d51a7da8
 
 print(DS_LEN)
 
 SPLIT = .9
 
-<<<<<<< HEAD
 train= tensorflow_dataset.take(round(DS_LEN*SPLIT))
 val=tensorflow_dataset.skip(round(DS_LEN*SPLIT))
-=======
-train = tensorflow_dataset.take(round(DS_LEN=SPLIT))
-val = tensorflow_dataset.skip(round(DS_LEN=SPLIT))
->>>>>>> 74cb52a06485cf7b047cd604ff2dc9f5d51a7da8
 
 del tensorflow_dataset
 
 from transformers import TFAutoModel
 from tensorflow import keras
 
-<<<<<<< HEAD
 bert= TFAutoModel.from_pretrained('Rostlab/prot_bert_bfd')
 
 input_ids=tf.keras.layers.Input(shape=(MAX_LEN,),name='input_ids', dtype='int32')
 mask=tf.keras.layers.Input(shape=(MAX_LEN,),name='attention_mask', dtype='int32')
-=======
-bert = TFAutoModel.from_pretrained('Rostlab/prot_bert_bfd_localization')
->>>>>>> 74cb52a06485cf7b047cd604ff2dc9f5d51a7da8
 
 input_ids = tf.keras.layers.Input(shape=(MAX_LEN), name='input_ids', dtype='int32')
 mask = tf.keras.layers.Input(shape=(MAX_LEN), name='attention_mask', dtype='int32')
 
 embeddings = bert(input_ids, attention_mask=mask)[0]
 
-<<<<<<< HEAD
 X=tf.keras.layers.GlobalMaxPooling1D()(embeddings)
 X=tf.keras.layers.BatchNormalization()(X)
 X=tf.keras.layers.Dense(128,activation='relu')(X)
@@ -361,22 +308,6 @@ optimizer= tf.keras.optimizers.Adam(0.01)
 loss= tf.keras.losses.CategoricalCrossentropy()
 acc= tf.keras.metrics.CategoricalAccuracy('accuracy')
 
-=======
-X = tf.keras.layers.GlobalMaxPooling1D()(embeddings)
-X = tf.keras.layers.BatchNormalization()(X)
-X = tf.keras.layers.Dense(128, activation='relu')(X)
-X = tf.keras.layers.Dropout(0.1)(X)
-X = tf.keras.layers.Dense(32, activation='relu')(X)
-X = tf.keras.layers.Dense(7, activation='softmax', name='outputs')(X)
-
-model = tf.keras.Model(intputs=[input_ids, mask], outputs=y)
-
-model.summary()
-
-optimizer = tf.keras.optimizer.Adam(0.01)
-loss = tf.keras.losses.CategoricalCrossentropy()
-acc = tf.keras.metrics.CategoricalAccuracy('accuracy')
->>>>>>> 74cb52a06485cf7b047cd604ff2dc9f5d51a7da8
 
 model.compile(optimizer=optimizer, loss=loss, metrics=[acc])
 
