@@ -27,8 +27,7 @@ import tensorflow as tf
 from tensorflow.keras import layers
 
 
-# feed list of strings into fit_on_texts()
-# s: example sequence
+# example sequence and ec's
 s = ['MLPPWTLGLLLLATVRGKEVCYGQLGCFSDEKPWAGTLQRPVKLLPWSPEDIDTRFLLYTNENPNNFQLITGTEPDTIEASNFQLDRKTRFIIHGFLDKAEDSWPSDMCKKMFEVEKVNCICVDWRHGSRAMYTQAVQNIRVVGAETAFLIQALSTQLGYSLEDVHVIGHSLGAHTAAEAGRRLGGRVGRITGLDPAGPCFQDEPEEVRLDPSDAVFVDVIHTDSSPIVPSLGFGMSQKVGHLDFFPNGGKEMPGCKKNVLSTITDIDGIWEGIGGFVSCNHLRSFEYYSSSVLNPDGFLGYPCASYDEFQESKCFPCPAEGCPKMGHYADQFKGKTSAVEQTFFLNTGESGNFTSWRYKISVTLSGKEKVNGYIRIALYGSNENSKQYEIFKGSLKPDASHTCAIDVDFNVGKIQKVKFLWNKRGINLSEPKLGASQITVQSGEDGTEYNFCSSDTVEENVLQSLYPC ',
 'MIGRLNHVAIAVPDLEAAAAQYRNTLGAEVGAPQDEPDHGVTVIFITLPNTKIELLHPLGEGSPIAGFLEKNPAGGIHHICYEVEDILAARDRLKEAGARVLGSGEPKIGAHGKPVLFLHPKDFNGCLVELEQV']
 ec = ['4.1.1.15', '5.1.99.-']
@@ -118,17 +117,17 @@ class TransformerBlock(layers.Layer):
         return self.layernorm2(out1 + ffn_output)
 
 
-inputs = layers.Input()     # input layer of unspecified dimensions
-imtesting_emb = embeddings_layer(vocab, embed_dims)
-x = imtesting_emb(inputs)
-imtesting_trn = TransformerBlock(embed_dim=embed_dims, num_heads=num_heads, ff_dim=ff_dim)
-x = imtesting_trn(x)
-x = layers.Dropout(0.1)(x)
-x = layers.Dense(20, activation="relu")(x)
-x = layers.Dropout(0.1)(x)
-outputs = layers.Dense(4, activation="softmax")(x)
-
-model = tf.keras.Model(inputs=inputs, outputs=outputs)
+# inputs = layers.Input()     # input layer of unspecified dimensions
+# imtesting_emb = embeddings_layer(vocab, embed_dims)
+# x = imtesting_emb(inputs)
+# imtesting_trn = TransformerBlock(embed_dim=embed_dims, num_heads=num_heads, ff_dim=ff_dim)
+# x = imtesting_trn(x)
+# x = layers.Dropout(0.1)(x)
+# x = layers.Dense(20, activation="relu")(x)
+# x = layers.Dropout(0.1)(x)
+# outputs = layers.Dense(4, activation="softmax")(x)
+#
+# model = tf.keras.Model(inputs=inputs, outputs=outputs)
 
 
 
