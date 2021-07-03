@@ -12,6 +12,7 @@
 
 from ast import increment_lineno
 import collections
+from imp import SEARCH_ERROR
 import logging
 import os
 import pathlib
@@ -22,6 +23,8 @@ import time
 from matplotlib import colors
 
 import numpy as np
+from numpy.core.fromnumeric import shape
+from numpy.lib.histograms import histogram
 import pandas as pd
 import scipy as sp
 # import sentencepiece as spm
@@ -31,18 +34,22 @@ import tensorflow as tf
 import json
 import sqlite3
 from tensorflow.keras import layers
+from tensorflow.python.keras.backend import dtype
+from tensorflow.python.keras.callbacks import History
+from tensorflow.python.ops.gen_logging_ops import Print
 
  
  
 logging.getLogger('tensorflow').setLevel(logging.ERROR)  # suppress warnings
 
 
-dataset= pd.read_csv('[DATA]\DummyData\TestData.csv')  #taking data from csv file, you can easily export the data from SQL file to csv
+dataset= pd.read_csv('[DATA]\DB\MainDataset\MainDataset.csv')  #taking data from csv file, you can easily export the data from SQL file to csv
 
 TraininDataset=pd.read_csv('[DATA]\TrainingData\TrainDataset.csv') 
 
-EcNumberDataset =list(TraininDataset.iloc[:,2])#features
-SequenceDataset =list(TraininDataset.iloc[:,1])   #Dependent values  
+EcNumberDataset =list(dataset.iloc[:,4])#features
+SequenceDataset =list(dataset.iloc[:,5])   #Dependent values  
+
 
 # print(EcNumberDataset)
 # print(SequenceDataset)
@@ -194,50 +201,127 @@ tokenizer = BertTokenizer.from_pretrained('Rostlab/prot_bert_bfd_localization', 
 tokens=tokenizer.encode_plus(Sequence_Example, max_length=MAX_LEN,truncation=True,padding="max_length",
                                 add_special_tokens=True,return_token_type_ids=False,return_attention_mask=True, return_tensors='tf')
 
+
+print("TOKENS")
 print(tokens)
 
 
 Xids= np.zeros((len(dataset),MAX_LEN))
 Xmask= np.zeros((len(dataset),MAX_LEN))
 
+print("XIDS SHAPE")
 print(Xids.shape)
 
 
 
 
 
-for i, sequence in enumerate (dataset['sequence_string']):
+for i, sequence in enumerate (dataset.iloc[:,5]):
     tokens=tokenizer.encode_plus(sequence, max_length=MAX_LEN,truncation=True,padding="max_length",
                                 add_special_tokens=True,return_token_type_ids=False,return_attention_mask=True, return_tensors='tf')
     
     Xids[i,:], Xmask[i,:]= tokens['input_ids'], tokens['attention_mask']
-
+print("XIDS")
 print(Xids)
+print("XMASKS")
 print(Xmask)
 
 
-print(TraininDataset.iloc[:,2].unique)
+print(dataset.iloc[:,4].unique)
 
-arr=TraininDataset.iloc[:,2].values
+arr=dataset.iloc[:,4].values
 
+print("Array Size")
 print(arr.size)
 
 labels=np.zeros((arr.size,arr.max()+1))
 
+print("Labels Shape")
 print(labels.shape)
 
 labels[np.arange(arr.size),arr]=1
+
+print("LABELS")
 print(labels)
 
 
+#Below code is for off loading the data
+
+# with open('xids.npy','wb') as f:
+#     np.save(f,Xids)
+# with open('xmask.npy','wb') as f:
+#     np.save(f,Xmask)
+# with open('labels.npy','wb') as f:
+#     np.save(f,labels)
+# del df,Xids,Xmask,labels
+
+tf.config.experimental.list_physical_devices('GPU')
+
+tensorflow_dataset=tf.data.Dataset.from_tensor_slices((Xids,Xmask,labels))
+
+print("DATASET ON TENSOR FLOW EXAMPLE")
+for i in tensorflow_dataset.take(1):
+    print(i)
 
 
+def map_func(input_ids,masks,labels):
+    return{'input_ids':input_ids,'attention mask':masks},labels
 
 
+tensorflow_dataset=tensorflow_dataset.map(map_func)
+
+for i in tensorflow_dataset.take(1):
+    print(i)
 
 
+tensorflow_dataset=tensorflow_dataset.shuffle(1000000).batch(32)
+
+DS_LEN=len(list(tensorflow_dataset))
+
+print(DS_LEN)
+
+SPLIT=.9
+
+train= tensorflow_dataset.take(round(DS_LEN=SPLIT))
+val=tensorflow_dataset.skip(round(DS_LEN=SPLIT))
+
+del tensorflow_dataset
+
+from transformers import TFAutoModel
+
+bert= TFAutoModel.from_pretrained('Rostlab/prot_bert_bfd_localization')
+
+input_ids=tf.keras.layers.Input(shape=(MAX_LEN),name='input_ids', dtype='int32')
+mask=tf.keras.layers.Input(shape=(MAX_LEN),name='attention_mask', dtype='int32')
+
+embeddings=bert(input_ids, attention_mask=mask)[0]
 
 
+X=tf.keras.layers.GlobalMaxPooling1D()(embeddings)
+X=tf.keras.layers.BatchNormalization()(X)
+X=tf.keras.layers.Dense(128,activation='relu')(X)
+X=tf.keras.layers.Dropout(0.1)(X)
+X=tf.keras.layers.Dense(32,activation='relu')(X)
+X=tf.keras.layers.Dense(7,activation='softmax', name='outputs')(X)
 
 
+model= tf.keras.Model(intputs=[input_ids, mask], outputs=y)
 
+model.summary()
+
+optimizer= tf.keras.optimizer.Adam(0.01)
+loss= tf.keras.losses.CategoricalCrossentropy()
+acc= tf.keras.metrics.CategoricalAccuracy('accuracy')
+
+
+model.compile(optimizer=optimizer, loss=loss, metrics=[acc])
+
+history=model.fit(
+
+    train,
+    validation_data=val,
+    epochs=100,
+
+)
+
+print(history)
