@@ -302,6 +302,7 @@ y=tf.keras.layers.Dense(8,activation='softmax', name='outputs')(X)
 
 model= tf.keras.Model(inputs=[input_ids, mask], outputs=[y])
 
+model.layers[2].trainable=False
 model.summary()
 
 optimizer= tf.keras.optimizers.Adam(0.01)
