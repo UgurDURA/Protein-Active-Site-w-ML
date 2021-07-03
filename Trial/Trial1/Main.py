@@ -14,6 +14,7 @@ import numpy as np
 import pandas as pd
 import tensorflow as tf
 from transformers import BertTokenizer
+import transformers
 
 logging.getLogger('tensorflow').setLevel(logging.ERROR)  # suppress warnings
 
@@ -151,16 +152,8 @@ SequenceDataset =list(dataset.iloc[:,5])   #Dependent values
 
 
 
+from transformers import AutoTokenizer
 
-# "Tokenization "
- 
-Sequence_Example=SequenceDataset[1]
-Ec_NumberExample=EcNumberDataset[1]
-
-print('Example Sequence:    ',Sequence_Example, " Example EC number:  ",Ec_NumberExample)
-
-
-from transformers import AutoTokenizer 
 
 MAX_LEN=512
 
@@ -182,15 +175,7 @@ Xmask = np.zeros((len(dataset), MAX_LEN))
 
 print("XIDS SHAPE")
 print(Xids.shape)
-
-for i, sequence in enumerate(dataset.iloc[:, 5]):
-    tokens = tokenizer.encode_plus(sequence, max_length=MAX_LEN, truncation=True, padding="max_length",
-                                   add_special_tokens=True, return_token_type_ids=False, return_attention_mask=True, return_tensors='tf')
-
-
-
-
-
+ 
 for i, sequence in enumerate (dataset.iloc[:,5]):
     tokens=tokenizer.encode_plus(sequence, max_length=MAX_LEN,truncation=True,padding="max_length",
                                 add_special_tokens=True,return_token_type_ids=False,return_attention_mask=True, return_tensors='tf')
@@ -203,7 +188,7 @@ print(type(Xids))
 print("XMASKS")
 print(Xmask)
 
-print(dataset.iloc[:, 4].unique)
+ 
 
 print(dataset['ECNumber'].unique)
 
@@ -264,7 +249,6 @@ tensorflow_dataset = tensorflow_dataset.map(map_func)
 for i in tensorflow_dataset.take(1):
     print(i)
 
-tensorflow_dataset = tensorflow_dataset.shuffle(1000000).batch(32)
 
 tensorflow_dataset=tensorflow_dataset.shuffle(100000).batch(32)
 
@@ -286,9 +270,6 @@ bert= TFAutoModel.from_pretrained('Rostlab/prot_bert_bfd')
 
 input_ids=tf.keras.layers.Input(shape=(MAX_LEN,),name='input_ids', dtype='int32')
 mask=tf.keras.layers.Input(shape=(MAX_LEN,),name='attention_mask', dtype='int32')
-
-input_ids = tf.keras.layers.Input(shape=(MAX_LEN), name='input_ids', dtype='int32')
-mask = tf.keras.layers.Input(shape=(MAX_LEN), name='attention_mask', dtype='int32')
 
 embeddings = bert(input_ids, attention_mask=mask)[0]
 
