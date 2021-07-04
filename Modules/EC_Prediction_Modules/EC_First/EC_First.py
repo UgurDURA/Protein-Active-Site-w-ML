@@ -150,85 +150,85 @@ SequenceDataset =list(dataset.iloc[:,5])   #Dependent values
 # # Show plot
 # plt.show()
 
-
-
-from transformers import AutoTokenizer
-
-
 MAX_LEN=512
 
-Sequence_Example = SequenceDataset[1]
-Ec_NumberExample = EcNumberDataset[1]
-
-print('Example Sequence:    ', Sequence_Example, " Example EC number:  ", Ec_NumberExample)
-
-tokenizer = AutoTokenizer.from_pretrained('Rostlab/prot_bert_bfd', do_lower_case=False, )
-tokens=tokenizer.encode_plus(Sequence_Example, max_length=MAX_LEN,truncation=True,padding="max_length",
-                                add_special_tokens=True,return_token_type_ids=False,return_attention_mask=True, return_tensors='tf')
+# from transformers import AutoTokenizer
 
 
-print("TOKENS")
-print(tokens)
 
-Xids = np.zeros((len(dataset), MAX_LEN))
-Xmask = np.zeros((len(dataset), MAX_LEN))
 
-print("XIDS SHAPE")
-print(Xids.shape)
+# Sequence_Example = SequenceDataset[1]
+# Ec_NumberExample = EcNumberDataset[1]
+
+# print('Example Sequence:    ', Sequence_Example, " Example EC number:  ", Ec_NumberExample)
+
+# tokenizer = AutoTokenizer.from_pretrained('Rostlab/prot_bert_bfd', do_lower_case=False, )
+# tokens=tokenizer.encode_plus(Sequence_Example, max_length=MAX_LEN,truncation=True,padding="max_length",
+#                                 add_special_tokens=True,return_token_type_ids=False,return_attention_mask=True, return_tensors='tf')
+
+
+# print("TOKENS")
+# print(tokens)
+
+# Xids = np.zeros((len(dataset), MAX_LEN))
+# Xmask = np.zeros((len(dataset), MAX_LEN))
+
+# print("XIDS SHAPE")
+# print(Xids.shape)
  
-for i, sequence in enumerate (dataset.iloc[:,5]):
-    tokens=tokenizer.encode_plus(sequence, max_length=MAX_LEN,truncation=True,padding="max_length",
-                                add_special_tokens=True,return_token_type_ids=False,return_attention_mask=True, return_tensors='tf')
+# for i, sequence in enumerate (dataset.iloc[:,5]):
+#     tokens=tokenizer.encode_plus(sequence, max_length=MAX_LEN,truncation=True,padding="max_length",
+#                                 add_special_tokens=True,return_token_type_ids=False,return_attention_mask=True, return_tensors='tf')
     
-    Xids[i,:], Xmask[i,:]= tokens['input_ids'], tokens['attention_mask']
+#     Xids[i,:], Xmask[i,:]= tokens['input_ids'], tokens['attention_mask']
 
 
-print("XIDS")
-print(type(Xids))
-print("XMASKS")
-print(Xmask)
+# print("XIDS")
+# print(type(Xids))
+# print("XMASKS")
+# print(Xmask)
 
  
 
-print(dataset['ECNumber'].unique)
+# print(dataset['ECNumber'].unique)
 
-arr=dataset['ECNumber'].values
+# arr=dataset['ECNumber'].values
 
-print("Array Size")
-print(arr.size)
+# print("Array Size")
+# print(arr.size)
 
-labels = np.zeros((arr.size, arr.max() + 1))
+# labels = np.zeros((arr.size, arr.max() + 1))
 
-print("Labels Shape")
-print(labels.shape)
+# print("Labels Shape")
+# print(labels.shape)
 
-labels[np.arange(arr.size), arr] = 1
+# labels[np.arange(arr.size), arr] = 1
 
-print("LABELS")
-print(labels)
+# print("LABELS")
+# print(labels)
 
 
-# Below code is for off loading the data
+# # Below code is for off loading the data
 
-with open('xids.npy','wb') as f:
-    np.save(f,Xids)
-with open('xmask.npy','wb') as f:
-    np.save(f,Xmask)
-with open('labels.npy','wb') as f:
-    np.save(f,labels)
+# with open('xids.npy','wb') as f:
+#     np.save(f,Xids)
+# with open('xmask.npy','wb') as f:
+#     np.save(f,Xmask)
+# with open('labels.npy','wb') as f:
+#     np.save(f,labels)
 
 
 
 #Below code is for load the data
 
-# with open('xids.npy','rb') as fp:
-#     Xids=np.load(fp)
+with open('xids.npy','rb') as fp:
+    Xids=np.load(fp)
 
-# with open('xmask.npy','rb') as fp:
-#     Xmask=np.load(fp)
+with open('xmask.npy','rb') as fp:
+    Xmask=np.load(fp)
 
-# with open('labels.npy','rb') as fp:
-#     labels=np.load(fp)
+with open('labels.npy','rb') as fp:
+    labels=np.load(fp)
 
 
 tf.config.experimental.list_physical_devices('GPU')
@@ -289,7 +289,7 @@ model.summary()
 optimizer= tf.keras.optimizers.Adam(0.01)
 loss= tf.keras.losses.CategoricalCrossentropy()
 acc= tf.keras.metrics.CategoricalAccuracy('accuracy')
-
+s
 
 model.compile(optimizer=optimizer, loss=loss, metrics=[acc])
 
