@@ -1,119 +1,61 @@
+'''
+scriptlet to divide and preprocess the entries in our database.
+as preprocessing, spaces are added inbetween every token in a sequence : addSpaces();
+additionally, EC numbers are divided into the digits by seperator '.' : ECnumberSeperator
+'''
+
 import sqlite3
 import pandas as pd
+from sklearn.model_selection import train_test_split
 
-
-con = sqlite3.connect('[DATA]/db/Enzymes.db')
-cur = con.cursor()
-
-
-dataset = pd.read_csv('[DATA]/DummyData/ExampleDATA.csv')
-EcNumberDataset = list(dataset.iloc[:,2])   #features         : ec_number_string
-SequenceDataset = list(dataset.iloc[:,4])   #Dependent values : sequence_string
-
-print(EcNumberDataset[1])
-print(SequenceDataset[1])
-print(len(dataset))
-
-
-EcNumberDatasetSeperated = pd.read_csv('[DATA]\DB\MainDataset\EcNumber.csv')
-SequenceDatasetSpaced = pd.read_csv('[DATA]\DB\MainDataset\Sequence.csv')
-
-cur.execute(
-    'CREATE TABLE MainDataset(AutoID integer primary key autoincrement, AccessionNumber str, EcNumberID int, SequenceID int, ECNumber int, Sequence str)')
-
-
-for i in range(len(dataset)):
-
-    cur.execute("INSERT INTO MainDataset(AccessionNumber,EcNumberID,SequenceID,ECNUmber,Sequence) VALUES "
-                    "('{0}', '{1}','{2}', '{3}','{4}')".format(EcNumberDatasetSeperated.iloc[i, 1], i, i, EcNumberDatasetSeperated.iloc[i, 3],
-                                                               SequenceDatasetSpaced.iloc[i, 3]))
-                    
-con.commit()    
-
-
-# 'Split dataset into test and validation'
-
-# from sklearn.model_selection import train_test_split
-
-# Ec_Number_train,Ec_Number_test,Sequence_train,Sequence_test =train_test_split(list(EcNumberDatasetSeperated.iloc[:,3]),list(SequenceDatasetSpaced.iloc[:,3]),test_size=0.2, random_state=1)
- 
-# cur.execute(
-#     'CREATE TABLE TrainDataset(TrainAutoID integer primary key autoincrement,Sequence_Train str, EcNumber_Train int)')
-
-
-# cur.execute(
-#     'CREATE TABLE TestDataset(TestID integer primary key autoincrement,Sequence_Test str, EcNumber_Test int)')
-
-
-# for i in range(len(Ec_Number_train)):
-
-#     cur.execute("INSERT INTO TrainDataset(Sequence_Train, EcNumber_Train) VALUES "
-#                     "('{0}', '{1}')".format(Sequence_train[i],Ec_Number_train[i]))
-#     print(Ec_Number_train[i])
-
-
-# for i in range(len(Ec_Number_test)):
-#     cur.execute("INSERT INTO TestDataset(Sequence_Test,EcNumber_Test) VALUES "
-#                     "('{0}', '{1}')".format(Sequence_test[i],Ec_Number_test[i]))
-#     print(Ec_Number_test[i])
-
-
-
- 
 
 # Add Space and Seperate the EC number
 
-# def addSpace(sequence):
-#     iterable=sequence
-#     separator = " " # A whitespace character.
-#                 # The string to which the method will be applied
-#     return separator.join(iterable)
+def addSpaces(sequence):
+    iterable = sequence    # The string to which the method will be applied
+    separator = " "  # A whitespace character.
+    return separator.join(iterable)
 
 
+def ECnumberSeperator(ECnumber):
+    '''
+    for now, seperates the numbers and returns them.
+    ennumerates N/A numbers into '0', will serve as only first number classification's output encoding.
+    '''
 
- 
-# cur.execute(
-#     'CREATE TABLE EcNumber(EcNumberAutoID integer primary key autoincrement,AccessionNumber str key,EcNumber_Full str, EcNumber_First int, EcNumber_Second int,EcNumber_Third int,EcNumber_Fourth int)')
+    ECnumber = ECnumber.replace("n", "-")
+    ECnumber = ECnumber.replace("-", "0")
+    print('EC Number: ' + ECnumber + '\n')
 
+    seperatedECnumber = ECnumber.split('.')
 
-# cur.execute(
-#     'CREATE TABLE Sequence(SequenceAutoID integer primary key autoincrement,AccessionNumber str key, Sequence str, Sequence_Spaced str)')
-
-
-
-# Ec_Number_FirstOnly=[]
-# Ec_Number_SecondOnly=[]
-# Ec_Number_ThirdOnly=[]
-# Ec_Number_FourthOnly=[]
- 
-
-# for i in EcNumberDataset:
-
-#     i=i.replace("-","0")
-#     i=i.replace("n","")
-#     print(i)
-
-#     Seperated_EcNumber= i.split('.')
-
-#     Ec_Number_FirstOnly.append(int(Seperated_EcNumber[0]))
-#     Ec_Number_SecondOnly.append(int(Seperated_EcNumber[1]))
-#     Ec_Number_ThirdOnly.append(int(Seperated_EcNumber[2]))
-#     Ec_Number_FourthOnly.append(int(Seperated_EcNumber[3]))
-
-# for i in range(len(dataset)):
-#     EcNumberDataset[i]=EcNumberDataset[i].replace("-","0")
-#     cur.execute("INSERT INTO EcNumber(AccessionNumber,EcNumber_Full, EcNumber_First, EcNumber_Second, EcNumber_Third, EcNumber_Fourth) VALUES "
-#                     "('{0}','{1}','{2}','{3}','{4}','{5}')".format(dataset.iloc[i,1],EcNumberDataset[i],Ec_Number_FirstOnly[i],Ec_Number_SecondOnly[i],Ec_Number_ThirdOnly[i],Ec_Number_FourthOnly[i]))
-   
-#     cur.execute("INSERT INTO Sequence(AccessionNumber, Sequence, Sequence_Spaced) VALUES "
-#                     "('{0}','{1}','{2}')".format(dataset.iloc[i,1],SequenceDataset[i],addSpace(SequenceDataset[i])))
-#     con.commit()
+    return seperatedECnumber[0], seperatedECnumber[1], seperatedECnumber[2], seperatedECnumber[3]
 
 
+con = sqlite3.connect('../../[DATA]/db/Enzymes.db')
+cur1 = con.cursor()
+cur2 = con.cursor()
 
+# dataset = pd.read_csv('../../[DATA]/DummyData/ExampleDATA.csv')
+# EcNumberDataset = list(dataset.iloc[:, 2])  # features         : ec_number_string
+# SequenceDataset = list(dataset.iloc[:, 4])  # Dependent values : sequence_string
+#
+# print(EcNumberDataset[1])
+# print(SequenceDataset[1])
+# print(len(dataset))
 
+cur1.execute("SELECT EnzymeAutoID, accession_string, ec_number_string, sequence_string FROM ExampleDATA;")
+rows = cur1.fetchall()
+print('length of table: ' + str(len(rows)))
 
-# print(Ec_Number_FirstOnly)
-# print(Ec_Number_SecondOnly)
-# print(Ec_Number_ThirdOnly)
-# print(Ec_Number_FourthOnly)
+for i in rows:
+    ec_1, ec_2, ec_3, ec_4 = ECnumberSeperator(i[2])
+
+    cur2.execute("INSERT INTO ExampleDataReady(EnzymeAutoID, accession_string, ec_number_one, ec_number_two, ec_number_three, ec_number_four, "
+                 "sequence_string) VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}')".format(i[0], i[1], ec_1, ec_2, ec_3, ec_4,
+                                                                                                    addSpaces(i[3])))
+    con.commit()
+
+cur1.close()
+cur2.close()
+con.close()
