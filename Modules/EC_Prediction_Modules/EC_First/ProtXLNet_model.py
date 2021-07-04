@@ -28,11 +28,11 @@ dataset = load_dataset('csv', data_files=['[DATA]/DummyData/ExampleDATA.csv'])
 
 
 
-tokenizer = XLNetTokenizer.from_pretrained("Resources/Models/prot_xlnet")
+tokenizer = XLNetTokenizer.from_pretrained("../../../Resources/Models/prot_xlnet")
 
 # prune head and add new classifier
-XLNet_model = TFXLNetForSequenceClassification.from_pretrained("Resources/Models/prot_xlnet",
-                                                         config="Resources/Models/prot_xlnet/config.json", from_pt=True)
+XLNet_model = TFXLNetForSequenceClassification.from_pretrained("../../../Resources/Models/prot_xlnet",
+                                                               config="Resources/Models/prot_xlnet/config.json", from_pt=True)
 
 embeddings = XLNet_model()[0]
 pooling = tf.keras.layers.GlobalMaxPooling1D()(embeddings)
