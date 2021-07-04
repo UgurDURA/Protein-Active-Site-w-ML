@@ -6,9 +6,9 @@ con = sqlite3.connect('[DATA]/db/Enzymes.db')
 cur = con.cursor()
 
 
-dataset = pd.read_csv('[DATA]\DB\Entries.csv')
-EcNumberDataset = list(dataset.iloc[:,2])   #features
-SequenceDataset = list(dataset.iloc[:,4])   #Dependent values
+dataset = pd.read_csv('[DATA]/DummyData/ExampleDATA.csv')
+EcNumberDataset = list(dataset.iloc[:,2])   #features         : ec_number_string
+SequenceDataset = list(dataset.iloc[:,4])   #Dependent values : sequence_string
 
 print(EcNumberDataset[1])
 print(SequenceDataset[1])
