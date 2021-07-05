@@ -1,13 +1,3 @@
-# To do list
-'1- DATA PREPROCESSING '
-' 1.1 Access the Data'
-' 1.2 Spit the data into features and depandents'
-' 1.3 At the end of the preprocessing the data split it into Test and Validation'
-'2- TOKENIZATION'
-' 2.1 BPE Algorithym'
-' 2.2 '
-
- 
 import numpy as np
 import pandas as pd
 import tensorflow as tf
@@ -18,11 +8,11 @@ import tensorflow as tf
 
 
 MAX_LEN=512
+BATCH_SIZE=4   # Possible Values: 4/8/16/32 
+DATA_SIZE=100
 
-
-
-dataset = pd.read_csv(r'C:\Users\omerc\OneDrive\Masaüstü\Projects\Protein-Active-Site-w-ML\[DATA]\MainDataset.csv')  # taking data from csv file, you can easily export the data from SQL file to csv
-dataset=dataset.iloc[0:100,:]
+dataset = pd.read_csv(r'[DATA]\MainDataset.csv')  # taking data from csv file, you can easily export the data from SQL file to csv
+dataset=dataset.iloc[0:DATA_SIZE,:]
 print(len(dataset))
 
 
