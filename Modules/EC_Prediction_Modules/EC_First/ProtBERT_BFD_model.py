@@ -14,8 +14,8 @@ tokenizer = AutoTokenizer.from_pretrained('../../../Resources/Models/prot_bert_b
 #                                add_special_tokens=True, return_token_type_ids=False, return_attention_mask=True, return_tensors='tf')
 
 dataset = pd.read_csv('../../../[DATA]/DummyData/ExampleDataReady.csv')
-EcNumberDataset = list(dataset.iloc[:, 2])  # features         : ec_number_one
-SequenceDataset = list(dataset.iloc[:, 6])  # Dependent values : sequence_string
+# EcNumberDataset = list(dataset.iloc[:, 2])  # features         : ec_number_one
+# SequenceDataset = list(dataset.iloc[:, 6])  # Dependent values : sequence_string
 
 Xids = np.zeros((len(dataset), MAX_LEN))
 Xmask = np.zeros((len(dataset), MAX_LEN))
@@ -23,7 +23,7 @@ Xmask = np.zeros((len(dataset), MAX_LEN))
 print("XIDS SHAPE")
 print(Xids.shape)
 
-for i, sequence in enumerate(SequenceDataset):
+for i, sequence in enumerate(dataset['sequence_string'].values):
     tokens = tokenizer(sequence, max_length=MAX_LEN, truncation=True, padding="max_length",
                        add_special_tokens=True, return_token_type_ids=False, return_attention_mask=True, return_tensors='tf')
 
@@ -46,6 +46,8 @@ print("Labels Shape")
 print(labels.shape)
 
 labels[np.arange(arr.size), arr] = 1
+
+del dataset
 
 # print("LABELS")
 # print(labels)
@@ -97,7 +99,7 @@ val = tensorflow_dataset.skip(round(DS_LEN * SPLIT))
 
 del tensorflow_dataset
 
-bert = TFAutoModel.from_pretrained('../../../Resources/Models/prot_bert_bfd')
+bert = TFAutoModel.from_pretrained('../../../Resources/Models/prot_bert_bfd', config='../../../Resources/Models/prot_bert_bfd/config.json')
 
 input_ids = tf.keras.layers.Input(shape=(MAX_LEN,), name='input_ids', dtype='int32')
 mask = tf.keras.layers.Input(shape=(MAX_LEN,), name='attention_mask', dtype='int32')
@@ -106,9 +108,9 @@ embeddings = bert(input_ids, attention_mask=mask)[0]
 
 X = tf.keras.layers.GlobalMaxPooling1D()(embeddings)
 X = tf.keras.layers.BatchNormalization()(X)
-X = tf.keras.layers.Dense(128, activation='relu')(X)
-X = tf.keras.layers.Dropout(0.1)(X)
 X = tf.keras.layers.Dense(32, activation='relu')(X)
+X = tf.keras.layers.Dropout(0.1)(X)
+X = tf.keras.layers.Dense(16, activation='relu')(X)
 y = tf.keras.layers.Dense(7, activation='softmax', name='outputs')(X)
 
 model = tf.keras.Model(inputs=[input_ids, mask], outputs=[y])
@@ -125,7 +127,7 @@ model.compile(optimizer=optimizer, loss=loss, metrics=[acc])
 history = model.fit(
     train,
     validation_data=val,
-    epochs=100,
+    epochs=5,
 )
 
 print(history)
