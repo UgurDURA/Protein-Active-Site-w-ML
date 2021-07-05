@@ -1,0 +1,2 @@
+https://huggingface.co/blog/how-to-train
+https://aws.amazon.com/tr/blogs/machine-learning/fine-tune-and-deploy-the-protbert-model-for-protein-classification-using-amazon-sagemaker/
