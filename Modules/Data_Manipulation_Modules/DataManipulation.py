@@ -5,8 +5,6 @@ additionally, EC numbers are divided into the digits by seperator '.' : ECnumber
 '''
 
 import sqlite3
-import pandas as pd
-from sklearn.model_selection import train_test_split
 
 
 # Add Space and Seperate the EC number
