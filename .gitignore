@@ -4,5 +4,7 @@
 *.csv
 .vscode
 *.__pycache__
-*.txt
 *.npy
+checkpoints/checkpoint
+*.data-00000-of-00001
+*.index
