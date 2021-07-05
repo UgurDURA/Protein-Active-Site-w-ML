@@ -23,7 +23,7 @@ def ECnumberSeperator(ECnumber):
     ennumerates N/A numbers into '0', will serve as only first number classification's output encoding.
     '''
 
-    ECnumber = ECnumber.replace("n", "-")
+    ECnumber = ECnumber.replace("n", "")
     ECnumber = ECnumber.replace("-", "0")
     print('EC Number: ' + ECnumber + '\n')
 
@@ -51,9 +51,9 @@ print('length of table: ' + str(len(rows)))
 for i in rows:
     ec_1, ec_2, ec_3, ec_4 = ECnumberSeperator(i[2])
 
-    cur2.execute("INSERT INTO ExampleDataReady(EnzymeAutoID, accession_string, ec_number_one, ec_number_two, ec_number_three, ec_number_four, "
-                 "sequence_string) VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}')".format(i[0], i[1], ec_1, ec_2, ec_3, ec_4,
-                                                                                                    addSpaces(i[3])))
+    cur2.execute("INSERT OR REPLACE INTO ExampleDataReady(EnzymeAutoID, accession_string, ec_number_one, ec_number_two, ec_number_three, "
+                 "ec_number_four, sequence_string) VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}')".format(i[0], i[1], ec_1, ec_2, ec_3,
+                                                                                                                    ec_4, addSpaces(i[3])))
     con.commit()
 
 cur1.close()
