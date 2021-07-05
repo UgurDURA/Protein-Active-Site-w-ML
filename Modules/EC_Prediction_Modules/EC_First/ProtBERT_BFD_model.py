@@ -7,7 +7,7 @@ import numpy as np
 import tensorflow as tf
 from transformers import AutoTokenizer, TFAutoModel
 
-MAX_LEN = 512
+MAX_LEN = 256
 
 tokenizer = AutoTokenizer.from_pretrained('../../../Resources/Models/prot_bert_bfd', do_lower_case=False, )
 # tokens = tokenizer.encode_plus(Sequence_Example, max_length=MAX_LEN, truncation=True, padding="max_length",
@@ -86,7 +86,7 @@ def map_func(input_ids, masks, labels):
 
 
 tensorflow_dataset = tensorflow_dataset.map(map_func)
-tensorflow_dataset = tensorflow_dataset.shuffle(100000).batch(32)
+tensorflow_dataset = tensorflow_dataset.shuffle(100000).batch(8)
 
 DS_LEN = len(list(tensorflow_dataset))
 
