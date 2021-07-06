@@ -7,7 +7,7 @@ additionally, EC numbers are divided into the digits by seperator '.' : ECnumber
 import sqlite3
 
 
-# Add Space and Seperate the EC number
+# simple functions to add space between AA sequences, and seperating the EC numbers:
 
 def addSpaces(sequence):
     iterable = sequence    # The string to which the method will be applied
@@ -30,30 +30,32 @@ def ECnumberSeperator(ECnumber):
     return seperatedECnumber[0], seperatedECnumber[1], seperatedECnumber[2], seperatedECnumber[3]
 
 
-con = sqlite3.connect('../../[DATA]/db/Enzymes.db')
-cur1 = con.cursor()
-cur2 = con.cursor()
+def main():
 
-# dataset = pd.read_csv('../../[DATA]/DummyData/ExampleDATA.csv')
-# EcNumberDataset = list(dataset.iloc[:, 2])  # features         : ec_number_string
-# SequenceDataset = list(dataset.iloc[:, 4])  # Dependent values : sequence_string
-#
-# print(EcNumberDataset[1])
-# print(SequenceDataset[1])
-# print(len(dataset))
+    con = sqlite3.connect('../../[DATA]/db/Enzymes.db')
+    cur1 = con.cursor()
+    cur2 = con.cursor()
 
-cur1.execute("SELECT EnzymeAutoID, accession_string, ec_number_string, sequence_string FROM ExampleDATA;")
-rows = cur1.fetchall()
-print('length of table: ' + str(len(rows)))
+    # dataset = pd.read_csv('../../[DATA]/DummyData/ExampleDATA.csv')
+    # EcNumberDataset = list(dataset.iloc[:, 2])  # features         : ec_number_string
+    # SequenceDataset = list(dataset.iloc[:, 4])  # Dependent values : sequence_string
+    #
+    # print(EcNumberDataset[1])
+    # print(SequenceDataset[1])
+    # print(len(dataset))
 
-for i in rows:
-    ec_1, ec_2, ec_3, ec_4 = ECnumberSeperator(i[2])
+    cur1.execute("SELECT EnzymeAutoID, accession_string, ec_number_string, sequence_string FROM ExampleDATA;")
+    rows = cur1.fetchall()
+    print('length of table: ' + str(len(rows)))
 
-    cur2.execute("INSERT OR REPLACE INTO ExampleDataReady(EnzymeAutoID, accession_string, ec_number_one, ec_number_two, ec_number_three, "
-                 "ec_number_four, sequence_string) VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}')".format(i[0], i[1], ec_1, ec_2, ec_3,
-                                                                                                                    ec_4, addSpaces(i[3])))
-    con.commit()
+    for i in rows:
+        ec_1, ec_2, ec_3, ec_4 = ECnumberSeperator(i[2])
 
-cur1.close()
-cur2.close()
-con.close()
+        cur2.execute("INSERT OR REPLACE INTO ExampleDataReady(EnzymeAutoID, accession_string, ec_number_one, ec_number_two, ec_number_three, "
+                     "ec_number_four, sequence_string) VALUES ('{0}', '{1}', '{2}', '{3}', '{4}', '{5}', '{6}')".format(i[0], i[1], ec_1, ec_2, ec_3,
+                                                                                                                        ec_4, addSpaces(i[3])))
+        con.commit()
+
+    cur1.close()
+    cur2.close()
+    con.close()
