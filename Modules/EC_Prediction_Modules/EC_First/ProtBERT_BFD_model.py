@@ -7,8 +7,8 @@ import os
 import transformers
 
 MAX_LEN = 512
-BATCH_SIZE = 4  # Possible Values: 4/8/16/32
-DATA_SIZE = 100000
+BATCH_SIZE = 16  # Possible Values: 4/8/16/32
+DATA_SIZE = 1000
 # CURRENT_PATH = os.getcwd()
 
 # dataset = pd.read_csv(r'[DATA]\MainDataset.csv')  # taking data from csv file, you can easily export the data from SQL file to csv
