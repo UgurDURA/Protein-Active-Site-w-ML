@@ -3,27 +3,26 @@ import pandas as pd
 from transformers import AutoTokenizer, TFAutoModel
 import tensorflow as tf
 import sqlite3
-import os
-import transformers
 
 MAX_LEN = 512
 BATCH_SIZE = 16  # Possible Values: 4/8/16/32
 DATA_SIZE = 1000
-# CURRENT_PATH = os.getcwd()
+
+def map_func(input_ids, masks, labels):
+    return {'input_ids': input_ids, 'attention_mask': masks}, labels
 
 # dataset = pd.read_csv(r'[DATA]\MainDataset.csv')  # taking data from csv file, you can easily export the data from SQL file to csv
 # dataset = dataset.iloc[0:DATA_SIZE, :]
-# print(len(dataset))
 
 # read data from Enzymes.db, put it into dataset container
 con = sqlite3.connect(r'..\..\..\[DATA]\db\Enzymes.db')
 
-# cur.execute("SELECT ec_number_one, sequence_string FROM EntriesReady LIMIT ('{0}')".format(DATA_SIZE))  # remove LIMIT if you want the entire dataset.
-
+# cur.execute("SELECT ec_number_one, sequence_string FROM EntriesReady LIMIT ('{0}')".format(DATA_SIZE))
+# remove LIMIT if you want the entire dataset.
 dataset = pd.read_sql_query("SELECT ec_number_one, sequence_string FROM EntriesReady LIMIT ('{0}')".format(DATA_SIZE), con)
 
 # print(dataset.columns)
-# Index(['ec_number_one', 'sequence_string'], dtype='object')
+#>>> Index(['ec_number_one', 'sequence_string'], dtype='object')
 
 tokenizer = AutoTokenizer.from_pretrained('Rostlab/prot_bert_bfd', do_lower_case=False, )
 
@@ -85,14 +84,9 @@ print(labels)
 
 tensorflow_dataset = tf.data.Dataset.from_tensor_slices((Xids, Xmask, labels))
 
-print("DATASET ON TENSOR FLOW EXAMPLE")
-for i in tensorflow_dataset.take(1):
-    print(i)
-
-
-def map_func(input_ids, masks, labels):
-    return {'input_ids': input_ids, 'attention_mask': masks}, labels
-
+# print("DATASET ON TENSOR FLOW EXAMPLE")
+# for i in tensorflow_dataset.take(1):
+#     print(i)
 
 tensorflow_dataset = tensorflow_dataset.map(map_func)
 
