@@ -1,9 +1,9 @@
 import logging
 import sqlite3
-import numpy as np
 import pandas as pd
 import tensorflow as tf
 from transformers import XLNetTokenizer, TFXLNetForSequenceClassification, TFTrainer, TFTrainingArguments
+from datasets import Dataset
 
 MAX_LEN = 512
 BATCH_SIZE = 16  # Possible Values: 4/8/16/32
@@ -11,17 +11,21 @@ DATA_SIZE = 1000
 
 logging.getLogger('tensorflow').setLevel(logging.ERROR)  # suppress warnings
 
-
 con = sqlite3.connect(r'..\..\..\[DATA]\db\Enzymes.db')
 dataset = pd.read_sql_query("SELECT ec_number_one, sequence_string FROM EntriesReady LIMIT ('{0}')".format(DATA_SIZE), con)
 
+HFdataset = Dataset.from_pandas(dataset)
 
 tokenizer = XLNetTokenizer.from_pretrained("../../../Resources/Models/prot_xlnet")
 
-SequenceDataset = tokenizer(dataset['sequence_string'], return_tensors="tf")       # input ID's aka tokenized sequences.
+SequenceDataset = tf.RaggedTensor() # not working. TODO: fix. read tokenized seqs into a list, then form raggedtensor mybe?
+for i, sequence in enumerate(dataset['sequence_string']):
+    SequenceDataset.append(tokenizer(sequence, add_special_tokens=True, return_token_type_ids=False,  return_tensors='tf'))
+
 EcNumberDataset = dataset['ec_number_one']
+labels = dataset['ec_number_one'].values
 
-
+# TODO: fix the dataset issues. HF or TF??
 tensorflow_dataset = tf.data.Dataset.from_tensor_slices((SequenceDataset, EcNumberDataset))
 tensorflow_dataset = tensorflow_dataset.shuffle(100000).batch(BATCH_SIZE)
 DS_LEN = len(list(tensorflow_dataset))
@@ -35,20 +39,18 @@ val = tensorflow_dataset.skip(round(DS_LEN * SPLIT))
 XLNet_model = TFXLNetForSequenceClassification.from_pretrained("../../../Resources/Models/prot_xlnet",
                                                                config="../../../Resources/Models/prot_xlnet/config.json", from_pt=True)
 
-# figure out input layer here
-
-embeddings = XLNet_model()
-
+inputs = tf.layers.Input(shape=(None, ))
+embeddings = XLNet_model(inputs)[0]
 X = tf.keras.layers.GlobalMaxPooling1D()(embeddings)
 X = tf.keras.layers.BatchNormalization()(X)
 X = tf.keras.layers.Dense(128, activation='relu')(X)
 X = tf.keras.layers.Dropout(0.1)(X)
 X = tf.keras.layers.Dense(32, activation='relu')(X)
-y = tf.keras.layers.Dense(arr.max() + 1, activation='softmax', name='outputs')(X)
+y = tf.keras.layers.Dense(labels.max() + 1, activation='softmax', name='outputs')(X)
 
-model = tf.keras.Model(inputs=], outputs=[y])
+model = tf.keras.Model(inputs=[inputs], outputs=[y])
 
-model.layers[].trainable = False
+model.layers[1].trainable = False
 model.summary()
 
 optimizer = tf.keras.optimizers.Adam(0.01)
@@ -88,4 +90,3 @@ model.save_weights('./checkpoints/my_checkpoint')  # change checkpoint dir/name 
 # )
 #
 # trainer.train()
-
