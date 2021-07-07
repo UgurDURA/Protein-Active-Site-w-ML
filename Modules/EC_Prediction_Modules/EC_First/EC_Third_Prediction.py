@@ -8,9 +8,9 @@ import os
 import transformers
 import matplotlib.pyplot as plt
 
-MAX_LEN = 256
-BATCH_SIZE = 16 # Possible Values: 4/8/16/32
-DATA_SIZE =1000
+MAX_LEN = 512
+BATCH_SIZE = 4 # Possible Values: 4/8/16/32
+DATA_SIZE =10000
 con = sqlite3.connect(r'[DATA]\Enzymes.db')
 
 dataset = pd.read_sql_query("SELECT ec_number_one, ec_number_two, ec_number_three, sequence_string FROM EntriesReady LIMIT ('{0}')".format(DATA_SIZE), con)
