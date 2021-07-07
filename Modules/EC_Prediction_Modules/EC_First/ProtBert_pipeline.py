@@ -1,9 +1,14 @@
-import numpy as np
-import pandas as pd
-from transformers import AutoTokenizer, TFAutoModel
-import tensorflow as tf
-import sqlite3
+# import numpy as np
+# import pandas as pd
+# from transformers import AutoTokenizer, TFAutoModel
+# import tensorflow as tf
+# import sqlite3
+import sys
+sys.path.append('../../')
+from Modules.Utility.DataManipulation import addSpaces
 
+seq = addSpaces('ASDFGHJKL')
+print(seq)
 
 '''
 TODO:
