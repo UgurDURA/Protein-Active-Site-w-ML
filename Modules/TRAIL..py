@@ -1,3 +1,4 @@
+from enum import unique
 import numpy as np
 import pandas as pd
 from transformers import AutoTokenizer, TFAutoModel
@@ -5,25 +6,17 @@ import tensorflow as tf
 import sqlite3
 import os
 import transformers
+import matplotlib.pyplot as plt
 
 MAX_LEN = 512
 BATCH_SIZE = 16  # Possible Values: 4/8/16/32
-DATA_SIZE = 1000
-# CURRENT_PATH = os.getcwd()
+DATA_SIZE = 100
 
-# dataset = pd.read_csv(r'[DATA]\MainDataset.csv')  # taking data from csv file, you can easily export the data from SQL file to csv
-# dataset = dataset.iloc[0:DATA_SIZE, :]
-# print(len(dataset))
+con = sqlite3.connect(r'[DATA]\Enzymes.db')
 
-# read data from Enzymes.db, put it into dataset container
+dataset = pd.read_sql_query("SELECT ec_number_one, ec_number_two, sequence_string FROM EntriesReady LIMIT ('{0}')".format(DATA_SIZE), con)
 
-# cur.execute("SELECT ec_number_one, sequence_string FROM EntriesReady LIMIT ('{0}')".format(DATA_SIZE))  # remove LIMIT if you want the entire dataset.
-
-dataset = pd.read_sql_query("SELECT ec_number_one, sequence_string FROM EntriesReady LIMIT ('{0}')".format(DATA_SIZE), con)
-
-# print(dataset.columns)
-# Index(['ec_number_one', 'sequence_string'], dtype='object')
-print(len(dataset))
+print(dataset)
 
 tokenizer = AutoTokenizer.from_pretrained('Rostlab/prot_bert_bfd', do_lower_case=False, )
 
@@ -44,19 +37,60 @@ print(type(Xids))
 print("XMASKS")
 print(Xmask)
 
-print(dataset['ec_number_one'].unique)
 
-arr = dataset['ec_number_one'].values
+Accumulated_EC=[]
+First_EC_List= list(dataset['ec_number_one'])
+Second_EC_List=list(dataset['ec_number_two'])
 
-print("Array Size")
-print(arr.size)
+from sklearn import svm
 
-labels = np.zeros((arr.size, arr.max() + 1))
+plt.scatter(First_EC_List,Second_EC_List)
+plt.show()
+
+print(First_EC_List)
+print(Second_EC_List)
+
+for i in range (len(dataset['ec_number_one'])):
+    Accumulated_EC.append(int(str(First_EC_List[i])+"666"+ str(Second_EC_List[i])))
+
+
+ 
+# print(Accumulated_EC)
+
+# arr =np.array(Accumulated_EC)
+# UniqueArr=np.unique(arr)
+# print("Unique ARR", UniqueArr)
+# print("Leng of the Unique arr: ", len(UniqueArr))
+# print("Array Size")
+# print(arr.size)
+# print(UniqueArr)
+
+# labels = np.zeros((arr.size, (UniqueArr.size)+1))
+
+# print("Labels Shape")
+# print(labels.shape)
+
+# labels[np.arange(arr.size), arr] = 1
+
+# print("LABELS")
+# print(labels)
+
+from sklearn.compose import ColumnTransformer
+from sklearn.preprocessing import OneHotEncoder
+
+
+ct = ColumnTransformer(transformers=[('encoder', OneHotEncoder(),[0])], remainder='passthrough')
+arr= np.array(ct.fit_transform(Accumulated_EC))
+
+
+labels=arr
+
+
 
 print("Labels Shape")
 print(labels.shape)
 
-labels[np.arange(arr.size), arr] = 1
+ 
 
 print("LABELS")
 print(labels)
@@ -81,7 +115,6 @@ print(labels)
 
 # with open(r'C:\Users\ugur_\Desktop\Projects\Protein-Active-Site-w-ML\labels.npy','rb') as fp:
 #     labels=np.load(fp)
-
 
 tensorflow_dataset = tf.data.Dataset.from_tensor_slices((Xids, Xmask, labels))
 
@@ -123,7 +156,7 @@ X = tf.keras.layers.BatchNormalization()(X)
 X = tf.keras.layers.Dense(128, activation='relu')(X)
 X = tf.keras.layers.Dropout(0.1)(X)
 X = tf.keras.layers.Dense(32, activation='relu')(X)
-y = tf.keras.layers.Dense(arr.max() + 1, activation='softmax', name='outputs')(X)
+y = tf.keras.layers.Dense((UniqueArr.size)+1, activation='softmax', name='outputs')(X)
 
 model = tf.keras.Model(inputs=[input_ids, mask], outputs=[y])
 
@@ -141,8 +174,3 @@ history = model.fit(
     validation_data=val,
     epochs=15,
 )
-
-print(history)
-model.save_weights('./checkpoints/my_checkpoint')
-# directory not saved in git. do not forget to clean up the files here and upload to Gdrive with appropriate name when you successfully run a
-# training and evaluation loop.
