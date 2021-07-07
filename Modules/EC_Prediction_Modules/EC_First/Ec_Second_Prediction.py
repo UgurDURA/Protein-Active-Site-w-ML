@@ -8,9 +8,9 @@ import os
 import transformers
 import matplotlib.pyplot as plt
 
-MAX_LEN = 256
-BATCH_SIZE = 25 # Possible Values: 4/8/16/32
-DATA_SIZE =10000
+MAX_LEN = 512
+BATCH_SIZE = 4 # Possible Values: 4/8/16/32
+DATA_SIZE =1000
 con = sqlite3.connect(r'[DATA]\Enzymes.db')
 
 dataset = pd.read_sql_query("SELECT ec_number_one, ec_number_two, sequence_string FROM EntriesReady LIMIT ('{0}')".format(DATA_SIZE), con)
@@ -152,9 +152,10 @@ embeddings = bert(input_ids, attention_mask=mask)[0]
 
 X = tf.keras.layers.GlobalMaxPooling1D()(embeddings)
 X = tf.keras.layers.BatchNormalization()(X)
-X = tf.keras.layers.Dense(128, activation='relu')(X)
+X = tf.keras.layers.Dense(256, activation='relu')(X)
+X = tf.keras.layers.Dense(128, activation='relu')(X) 
 X = tf.keras.layers.Dropout(0.1)(X)
-X = tf.keras.layers.Dense(32, activation='relu')(X)
+X = tf.keras.layers.Dense(64, activation='relu')(X)
 y = tf.keras.layers.Dense((ArraySize), activation='softmax', name='outputs')(X)
 
 model = tf.keras.Model(inputs=[input_ids, mask], outputs=[y])

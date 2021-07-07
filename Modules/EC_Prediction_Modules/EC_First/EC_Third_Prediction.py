@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 
 MAX_LEN = 512
 BATCH_SIZE = 4 # Possible Values: 4/8/16/32
-DATA_SIZE =10000
+DATA_SIZE =1000
 con = sqlite3.connect(r'[DATA]\Enzymes.db')
 
 dataset = pd.read_sql_query("SELECT ec_number_one, ec_number_two, ec_number_three, sequence_string FROM EntriesReady LIMIT ('{0}')".format(DATA_SIZE), con)
@@ -155,8 +155,6 @@ X = tf.keras.layers.BatchNormalization()(X)
 X = tf.keras.layers.Dense(256, activation='relu')(X)
 X = tf.keras.layers.Dropout(0.1)(X)
 X = tf.keras.layers.Dense(128, activation='relu')(X)
-X = tf.keras.layers.Dropout(0.1)(X)
-X = tf.keras.layers.Dense(64, activation='relu')(X)
 y = tf.keras.layers.Dense((ArraySize), activation='softmax', name='outputs')(X)
 
 model = tf.keras.Model(inputs=[input_ids, mask], outputs=[y])
