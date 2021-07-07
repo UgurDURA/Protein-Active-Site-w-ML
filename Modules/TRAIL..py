@@ -8,10 +8,9 @@ import os
 import transformers
 import matplotlib.pyplot as plt
 
-MAX_LEN = 512
-BATCH_SIZE = 16  # Possible Values: 4/8/16/32
-DATA_SIZE = 1000
-
+MAX_LEN = 256
+BATCH_SIZE = 25 # Possible Values: 4/8/16/32
+DATA_SIZE =10000
 con = sqlite3.connect(r'[DATA]\Enzymes.db')
 
 dataset = pd.read_sql_query("SELECT ec_number_one, ec_number_two, sequence_string FROM EntriesReady LIMIT ('{0}')".format(DATA_SIZE), con)
@@ -39,7 +38,7 @@ print(Xmask)
 
 
 Accumulated_EC=[]
-BAccumulated_EC=[]
+
 
 
 
@@ -52,50 +51,40 @@ print(First_EC_List)
 print(Second_EC_List)
 
 for i in range (len(dataset['ec_number_one'])):
-    BAccumulated_EC.append(int(str(First_EC_List[i])+"666"+ str(Second_EC_List[i])))
-    MergedEC=[First_EC_List[i],Second_EC_List[i]]
-    Accumulated_EC.append(MergedEC)
+    Accumulated_EC.append(int(str(First_EC_List[i])+"666"+ str(Second_EC_List[i])))
+   
+
+print(Accumulated_EC)
+ 
+
+from numpy import array
+from numpy import argmax
+from sklearn.preprocessing import LabelEncoder
+from sklearn.preprocessing import OneHotEncoder
+# define example
+data =Accumulated_EC
+values = array(data)
+print(values)
+array=np.unique(values)
+ArraySize=len(array)
+# integer encode
+label_encoder = LabelEncoder()
+integer_encoded = label_encoder.fit_transform(values)
+print(integer_encoded)
+# binary encode
+onehot_encoder = OneHotEncoder(sparse=False)
+integer_encoded = integer_encoded.reshape(len(integer_encoded), 1)
+onehot_encoded = onehot_encoder.fit_transform(integer_encoded)
+print(onehot_encoded)
+# invert first example
+inverted = label_encoder.inverse_transform([argmax(onehot_encoded[0, :])])
+print(inverted)
 
 
-df = pd.DataFrame(BAccumulated_EC)
-from sklearn.preprocessing import LabelEncoder, OneHotEncoder
-X=df.iloc[:,:].values
-labelEncoder=LabelEncoder()
-X[:,0]=labelEncoder.fit_transform(X[:,0])
-onehotencoder=OneHotEncoder()
-
-X=onehotencoder.fit_transform(X).toarray()
-print(X)
-# from sklearn.preprocessing import MultiLabelBinarizer
-
-# arr=MultiLabelBinarizer().fit_transform(Accumulated_EC)
 
 
-# print(Accumulated_EC)
-# print(arr)
 
-# print(arr.shape,arr.size)
-
-
-barr =np.array(BAccumulated_EC)
-UniqueArr=np.unique(barr)
-print("Unique ARR", UniqueArr)
-print("Leng of the Unique arr: ", len(UniqueArr))
-# print("Array Size")
-# print(arr.size)
-# print(UniqueArr)
-
-# labels = np.zeros((arr.size, (UniqueArr.size)+1))
-
-# print("Labels Shape")
-# print(labels.shape)
-
-# labels[np.arange(arr.size), arr] = 1
-
-# print("LABELS")
-# print(labels)
-
-labels=X
+labels=onehot_encoded
 
 print("Labels Shape")
 print(labels.shape)
@@ -166,7 +155,7 @@ X = tf.keras.layers.BatchNormalization()(X)
 X = tf.keras.layers.Dense(128, activation='relu')(X)
 X = tf.keras.layers.Dropout(0.1)(X)
 X = tf.keras.layers.Dense(32, activation='relu')(X)
-y = tf.keras.layers.Dense((UniqueArr.size), activation='softmax', name='outputs')(X)
+y = tf.keras.layers.Dense((ArraySize), activation='softmax', name='outputs')(X)
 
 model = tf.keras.Model(inputs=[input_ids, mask], outputs=[y])
 
