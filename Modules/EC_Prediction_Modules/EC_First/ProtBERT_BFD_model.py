@@ -16,6 +16,7 @@ DATA_SIZE = 1000
 # print(len(dataset))
 
 # read data from Enzymes.db, put it into dataset container
+con = sqlite3.connect(r'[DATA]\Enzymes.db')
 
 # cur.execute("SELECT ec_number_one, sequence_string FROM EntriesReady LIMIT ('{0}')".format(DATA_SIZE))  # remove LIMIT if you want the entire dataset.
 
