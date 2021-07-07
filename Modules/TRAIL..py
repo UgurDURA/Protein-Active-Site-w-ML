@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 
 MAX_LEN = 512
 BATCH_SIZE = 16  # Possible Values: 4/8/16/32
-DATA_SIZE = 100
+DATA_SIZE = 1000
 
 con = sqlite3.connect(r'[DATA]\Enzymes.db')
 
@@ -39,28 +39,48 @@ print(Xmask)
 
 
 Accumulated_EC=[]
+BAccumulated_EC=[]
+
+
+
 First_EC_List= list(dataset['ec_number_one'])
 Second_EC_List=list(dataset['ec_number_two'])
 
-from sklearn import svm
-
-plt.scatter(First_EC_List,Second_EC_List)
-plt.show()
+A=[[First_EC_List],[Second_EC_List]]
 
 print(First_EC_List)
 print(Second_EC_List)
 
 for i in range (len(dataset['ec_number_one'])):
-    Accumulated_EC.append(int(str(First_EC_List[i])+"666"+ str(Second_EC_List[i])))
+    BAccumulated_EC.append(int(str(First_EC_List[i])+"666"+ str(Second_EC_List[i])))
+    MergedEC=[First_EC_List[i],Second_EC_List[i]]
+    Accumulated_EC.append(MergedEC)
 
 
- 
+df = pd.DataFrame(BAccumulated_EC)
+from sklearn.preprocessing import LabelEncoder, OneHotEncoder
+X=df.iloc[:,:].values
+labelEncoder=LabelEncoder()
+X[:,0]=labelEncoder.fit_transform(X[:,0])
+onehotencoder=OneHotEncoder()
+
+X=onehotencoder.fit_transform(X).toarray()
+print(X)
+# from sklearn.preprocessing import MultiLabelBinarizer
+
+# arr=MultiLabelBinarizer().fit_transform(Accumulated_EC)
+
+
 # print(Accumulated_EC)
+# print(arr)
 
-# arr =np.array(Accumulated_EC)
-# UniqueArr=np.unique(arr)
-# print("Unique ARR", UniqueArr)
-# print("Leng of the Unique arr: ", len(UniqueArr))
+# print(arr.shape,arr.size)
+
+
+barr =np.array(BAccumulated_EC)
+UniqueArr=np.unique(barr)
+print("Unique ARR", UniqueArr)
+print("Leng of the Unique arr: ", len(UniqueArr))
 # print("Array Size")
 # print(arr.size)
 # print(UniqueArr)
@@ -75,17 +95,7 @@ for i in range (len(dataset['ec_number_one'])):
 # print("LABELS")
 # print(labels)
 
-from sklearn.compose import ColumnTransformer
-from sklearn.preprocessing import OneHotEncoder
-
-
-ct = ColumnTransformer(transformers=[('encoder', OneHotEncoder(),[0])], remainder='passthrough')
-arr= np.array(ct.fit_transform(Accumulated_EC))
-
-
-labels=arr
-
-
+labels=X
 
 print("Labels Shape")
 print(labels.shape)
@@ -156,7 +166,7 @@ X = tf.keras.layers.BatchNormalization()(X)
 X = tf.keras.layers.Dense(128, activation='relu')(X)
 X = tf.keras.layers.Dropout(0.1)(X)
 X = tf.keras.layers.Dense(32, activation='relu')(X)
-y = tf.keras.layers.Dense((UniqueArr.size)+1, activation='softmax', name='outputs')(X)
+y = tf.keras.layers.Dense((UniqueArr.size), activation='softmax', name='outputs')(X)
 
 model = tf.keras.Model(inputs=[input_ids, mask], outputs=[y])
 
