@@ -5,7 +5,7 @@ import tensorflow as tf
 import sqlite3
 
 MAX_LEN = 512
-BATCH_SIZE = 16  # Possible Values: 4/8/16/32
+BATCH_SIZE = 4  # Possible Values: 4/8/16/32
 DATA_SIZE = 1000
 
 def map_func(input_ids, masks, labels):
@@ -94,7 +94,7 @@ tensorflow_dataset = tensorflow_dataset.map(map_func)
 for i in tensorflow_dataset.take(1):
     print(i)
 
-tensorflow_dataset = tensorflow_dataset.shuffle(100000).batch(4)
+tensorflow_dataset = tensorflow_dataset.shuffle(100000).batch(BATCH_SIZE)
 
 DS_LEN = len(list(tensorflow_dataset))
 
