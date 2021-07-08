@@ -21,6 +21,7 @@ import json
 import os
 
 import datasets
+from datasets.tasks import TextClassification
 
 
 # TODO: Add BibTeX citation
@@ -84,7 +85,8 @@ class NewDataset(datasets.GeneratorBasedBuilder):
             features = datasets.Features(
                 {
                     "sequence": datasets.Value("string"),
-                    "ECnumber": datasets.Value("string")
+                    "ECnumber": datasets.features.ClassLabel(names=["1", "2", "3", "4", "5", "6", "7"])
+                    # TODO: specify the main classes of anzymes by name?
                     # These are the features of your dataset like images, labels ...
                 }
             )
@@ -112,6 +114,8 @@ class NewDataset(datasets.GeneratorBasedBuilder):
             license=_LICENSE,
             # Citation for the dataset
             citation=_CITATION,
+            task_templates=[TextClassification(text_column="text", label_column="label")],
+
         )
 
     def _split_generators(self, dl_manager):

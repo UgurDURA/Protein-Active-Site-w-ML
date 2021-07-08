@@ -1,7 +1,7 @@
 import sys
 
 sys.path.append('../../')
-from Modules.Utility.DataManipulation import map_func
+from Modules.Utility.data_manipulation import map_func
 import numpy as np
 import pandas as pd
 from transformers import AutoTokenizer, TFAutoModel, TFTrainingArguments, TFTrainer
