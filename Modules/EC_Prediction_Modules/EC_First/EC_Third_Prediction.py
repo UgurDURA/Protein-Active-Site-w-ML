@@ -8,8 +8,8 @@ import os
 import transformers
 import matplotlib.pyplot as plt
 
-MAX_LEN = 512
-BATCH_SIZE = 4 # Possible Values: 4/8/16/32
+MAX_LEN = 256
+BATCH_SIZE = 25 # Possible Values: 4/8/16/32
 DATA_SIZE =1000
 con = sqlite3.connect(r'[DATA]\Enzymes.db')
 
@@ -44,6 +44,7 @@ Accumulated_EC=[]
 
 First_EC_List= list(dataset['ec_number_one'])
 Second_EC_List=list(dataset['ec_number_two'])
+Third_EC_List=list(dataset['ec_number_three'])
 
 A=[[First_EC_List],[Second_EC_List]]
 
@@ -51,7 +52,7 @@ print(First_EC_List)
 print(Second_EC_List)
 
 for i in range (len(dataset['ec_number_one'])):
-    Accumulated_EC.append(int(str(First_EC_List[i])+"666"+ str(Second_EC_List[i])))
+    Accumulated_EC.append(int(str(First_EC_List[i])+"."+ str(Second_EC_List[i])+"."+str(Third_EC_List[i]))
    
 
 print(Accumulated_EC)
@@ -152,10 +153,10 @@ embeddings = bert(input_ids, attention_mask=mask)[0]
 
 X = tf.keras.layers.GlobalMaxPooling1D()(embeddings)
 X = tf.keras.layers.BatchNormalization()(X)
-X = tf.keras.layers.Dense(256, activation='relu')(X)
+X = tf.keras.layers.Dense(128, activation='sigmoid')(X) 
 X = tf.keras.layers.Dropout(0.1)(X)
-X = tf.keras.layers.Dense(128, activation='relu')(X)
-y = tf.keras.layers.Dense((ArraySize), activation='softmax', name='outputs')(X)
+X = tf.keras.layers.Dense(64, activation='sigmoid')(X)
+y = tf.keras.layers.Dense((ArraySize), activation='sigmoid', name='outputs')(X)
 
 model = tf.keras.Model(inputs=[input_ids, mask], outputs=[y])
 
