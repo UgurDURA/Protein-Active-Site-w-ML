@@ -7,25 +7,23 @@ from datasets import Dataset
 
 MAX_LEN = 512
 BATCH_SIZE = 16  # Possible Values: 4/8/16/32
-DATA_SIZE = 1000
+DATA_SIZE = 5000
 
 logging.getLogger('tensorflow').setLevel(logging.ERROR)  # suppress warnings
 
-con = sqlite3.connect(r'..\..\..\[DATA]\db\Enzymes.db')
+con = sqlite3.connect(r'..\..\..\[DATA]\Enzymes.db')
 dataset = pd.read_sql_query("SELECT ec_number_one, sequence_string FROM EntriesReady LIMIT ('{0}')".format(DATA_SIZE), con)
-
-HFdataset = Dataset.from_pandas(dataset)
 
 tokenizer = XLNetTokenizer.from_pretrained("../../../Resources/Models/prot_xlnet")
 
-SequenceDataset = tf.RaggedTensor() # not working. TODO: fix. read tokenized seqs into a list, then form raggedtensor mybe?
+SequenceDataset = []
 for i, sequence in enumerate(dataset['sequence_string']):
     SequenceDataset.append(tokenizer(sequence, add_special_tokens=True, return_token_type_ids=False,  return_tensors='tf'))
+tf.ragged.constant(SequenceDataset)
 
 EcNumberDataset = dataset['ec_number_one']
 labels = dataset['ec_number_one'].values
 
-# TODO: fix the dataset issues. HF or TF??
 tensorflow_dataset = tf.data.Dataset.from_tensor_slices((SequenceDataset, EcNumberDataset))
 tensorflow_dataset = tensorflow_dataset.shuffle(100000).batch(BATCH_SIZE)
 DS_LEN = len(list(tensorflow_dataset))
@@ -39,13 +37,13 @@ val = tensorflow_dataset.skip(round(DS_LEN * SPLIT))
 XLNet_model = TFXLNetForSequenceClassification.from_pretrained("../../../Resources/Models/prot_xlnet",
                                                                config="../../../Resources/Models/prot_xlnet/config.json", from_pt=True)
 
-inputs = tf.layers.Input(shape=(None, ))
+inputs = tf.keras.layers.Input(shape=(None, ))
 embeddings = XLNet_model(inputs)[0]
 X = tf.keras.layers.GlobalMaxPooling1D()(embeddings)
 X = tf.keras.layers.BatchNormalization()(X)
-X = tf.keras.layers.Dense(128, activation='relu')(X)
+X = tf.keras.layers.Dense(64, activation='relu')(X)
 X = tf.keras.layers.Dropout(0.1)(X)
-X = tf.keras.layers.Dense(32, activation='relu')(X)
+X = tf.keras.layers.Dense(16, activation='relu')(X)
 y = tf.keras.layers.Dense(labels.max() + 1, activation='softmax', name='outputs')(X)
 
 model = tf.keras.Model(inputs=[inputs], outputs=[y])
@@ -65,10 +63,10 @@ history = model.fit(
     epochs=15,
 )
 
-print(history)
-model.save_weights('./checkpoints/my_checkpoint')  # change checkpoint dir/name before running
-# directory not saved in git. do not forget to clean up the files here and upload to Gdrive with appropriate name when you successfully run a
-# training and evaluation loop.
+# print(history)
+# model.save_weights('./checkpoints/my_checkpoint')  # change checkpoint dir/name before running
+# # directory not saved in git. do not forget to clean up the files here and upload to Gdrive with appropriate name when you successfully run a
+# # training and evaluation loop.
 
 
 # training_args = TFTrainingArguments(

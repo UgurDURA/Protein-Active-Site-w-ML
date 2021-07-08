@@ -5,23 +5,43 @@ import sys
 
 sys.path.append('../../')
 
-import numpy as np
-import pandas as pd
-import tensorflow as tf
 from transformers import TextClassificationPipeline, AutoTokenizer, TFAutoModelForSequenceClassification
+
 from Modules.Utility.DataManipulation import addSpaces
+import tensorflow as tf
+from transformers import TFAutoModel
+MAX_LEN = 256
+BATCH_SIZE = 36 # Possible Values: 4/8/16/32
 
 gpu_devices = tf.config.list_physical_devices('GPU')
-print(gpu_devices) # clean up name using strip() maybe.
+print(gpu_devices)  # clean up name using strip() maybe.
 
 def main():
 
+
+    bert = TFAutoModel.from_pretrained('Rostlab/prot_bert_bfd')
+
+    input_ids = tf.keras.layers.Input(shape=(MAX_LEN,), name='input_ids', dtype='int32')
+    mask = tf.keras.layers.Input(shape=(MAX_LEN,), name='attention_mask', dtype='int32')
+
+    embeddings = bert(input_ids, attention_mask=mask)[0]
+
+    X = tf.keras.layers.GlobalMaxPooling1D()(embeddings)
+    X = tf.keras.layers.BatchNormalization()(X)
+    X = tf.keras.layers.Dense(128, activation='relu')(X)
+    X = tf.keras.layers.Dropout(0.1)(X)
+    X = tf.keras.layers.Dense(32, activation='relu')(X)
+    y = tf.keras.layers.Dense(8, activation='softmax', name='outputs')(X)
+
+    bert = tf.keras.Model(inputs=[input_ids, mask], outputs=[y])
+
+    bert.load_weights('./checkpoints/mini_test/weights.h5')
+
     # TODO: load the tokenizer and the pretrained model from (checkpoints directory)
-
-    tokenizer = AutoTokenizer.from_pretrained('Rostlab/prot_bert_bfd_localization', do_lower_case=False, )
-    bert = TFAutoModelForSequenceClassification.from_pretrained('Rostlab/prot_bert_bfd_localization', from_pt=True)
-
-    pipeline = TextClassificationPipeline(task="text-classification", model=bert, tokenizer=tokenizer, device=0, framework='tf', )
+    tokenizer = AutoTokenizer.from_pretrained('Rostlab/prot_bert_bfd', do_lower_case=False, )
+    # bert = TFAutoModelForSequenceClassification.from_pretrained('./checkpoints/mini_test/weights.h5', from_pt=True)
+    #
+    pipeline = TextClassificationPipeline(task="text-classification", model=bert, tokenizer=tokenizer, device=0, framework='tf')
     # TODO: change device to read from cuda apis
 
     seq = 'M E N H S K Q T E A P H P G T Y M P A G Y P P P Y P P A A F Q G P S D H A A Y P I P Q A G Y Q G P P G P Y P G P Q P G Y P V P P G G Y A G G ' \
@@ -31,8 +51,6 @@ def main():
           'T D A D N F G I Q F P L D L D V K M K A V M L G A C F L I D F M F F E R T G N E E Q R S G A W Q '
 
     print(pipeline(seq))
-
-    # TODO: add func to format the output of pipeline.
 
 
 if __name__ == "__main__":

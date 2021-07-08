@@ -29,6 +29,8 @@ def ECnumberSeperator(ECnumber):
 
     return seperatedECnumber[0], seperatedECnumber[1], seperatedECnumber[2], seperatedECnumber[3]
 
+def map_func(input_ids, masks, labels):
+    return {'input_ids': input_ids, 'attention_mask': masks}, labels
 
 def main():
 
