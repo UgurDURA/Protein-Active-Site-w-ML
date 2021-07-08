@@ -4,9 +4,9 @@ from transformers import AutoTokenizer, TFAutoModel
 import tensorflow as tf
 import sqlite3
 
-MAX_LEN = 512
-BATCH_SIZE = 4  # Possible Values: 4/8/16/32
-DATA_SIZE = 1000
+MAX_LEN = 256
+BATCH_SIZE = 25 # Possible Values: 4/8/16/32
+DATA_SIZE = 500
 
 def map_func(input_ids, masks, labels):
     return {'input_ids': input_ids, 'attention_mask': masks}, labels
@@ -134,7 +134,7 @@ model.compile(optimizer=optimizer, loss=loss, metrics=[acc])
 history = model.fit(
     train,
     validation_data=val,
-    epochs=15,
+    epochs=30
 )
 
 print(history)
