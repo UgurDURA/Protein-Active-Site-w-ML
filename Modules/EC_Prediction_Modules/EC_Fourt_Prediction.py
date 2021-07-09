@@ -53,7 +53,7 @@ print(First_EC_List)
 print(Second_EC_List)
 
 for i in range (len(dataset['ec_number_one'])):
-    Accumulated_EC.append((str(First_EC_List[i])+"."+ str(Second_EC_List[i])+"."+str(Third_EC_List[i]+"."+str(Fourt_EC_List[i]))))
+    Accumulated_EC.append(str(First_EC_List[i])+"."+ str(Second_EC_List[i])+"."+str(Third_EC_List[i])+"."+str(Fourt_EC_List[i]))
    
 
 print(Accumulated_EC)
