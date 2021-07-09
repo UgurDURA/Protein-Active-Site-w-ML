@@ -7,7 +7,7 @@ sys.path.append('../../')
 
 from transformers import TextClassificationPipeline, AutoTokenizer, TFAutoModelForSequenceClassification
 
-from Modules.Utility.DataManipulation import addSpaces
+from Modules.Utility.data_manipulation import addSpaces
 import tensorflow as tf
 from transformers import TFAutoModel
 MAX_LEN = 256

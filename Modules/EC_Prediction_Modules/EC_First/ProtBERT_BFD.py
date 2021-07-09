@@ -1,7 +1,7 @@
 import sys
 
 sys.path.append('../../')
-from Modules.Utility.DataManipulation import map_func
+from Modules.Utility.data_manipulation import map_func
 import numpy as np
 import pandas as pd
 from transformers import AutoTokenizer, TFAutoModel, TFTrainingArguments, TFTrainer
@@ -99,12 +99,16 @@ def main():
     val = tensorflow_dataset.skip(round(DS_LEN * SPLIT))
 
     # all above code is not working as we want it to.
-    # TODO: custom huggingface Dataset
+    # TODO: custom huggingface Dataset OR fix up the TF dataset obj
+
+    # ValueError: Data of type < class 'tensorflow.python.keras.engine.input_layer.InputLayer'> is not allowed only ( < class
+    # 'tensorflow.python.framework.ops.Tensor'>, < class 'bool' >, < class 'int' >, < class 'transformers.file_utils.ModelOutput' >,
+    # < class 'tuple' >, < class 'list' >, < class 'dict' >, < class 'numpy.ndarray' > ) is accepted for attention_mask.
 
     bert = TFAutoModel.from_pretrained('Rostlab/prot_bert_bfd')
 
-    input_ids = tf.keras.layers.Input(shape=(MAX_LEN,), name='input_ids', dtype='int32')
-    mask = tf.keras.layers.Input(shape=(MAX_LEN,), name='attention_mask', dtype='int32')
+    input_ids = tf.keras.layers.InputLayer(input_shape=(MAX_LEN,), name='input_ids', dtype='int32')
+    mask = tf.keras.layers.InputLayer(input_shape=(MAX_LEN,), name='attention_mask', dtype='int32')
 
     embeddings = bert(input_ids, attention_mask=mask)[0]
 
@@ -138,7 +142,7 @@ def main():
     json_config = model.get_config()
     # print this json to file
     print(json_config)
-    model.save('./checkpoints/mini_test2/tf_model.h5py')
+    # model.save('./checkpoints/mini_test2/tf_model.h5py')
 
     tf.keras.models.save_model(
         model, './checkpoints/mini_test2/tf_model.h5', overwrite=True,  save_format='h5',

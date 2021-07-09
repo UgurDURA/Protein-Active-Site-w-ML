@@ -36,8 +36,9 @@ val = tensorflow_dataset.skip(round(DS_LEN * SPLIT))
 # prune head and add new classifier
 XLNet_model = TFXLNetForSequenceClassification.from_pretrained("../../../Resources/Models/prot_xlnet",
                                                                config="../../../Resources/Models/prot_xlnet/config.json", from_pt=True)
+# TODO : edit this layer properly
+inputs = tf.keras.layers.InputLayer(input_shape=None, name="input layer", ragged=True, type_spec=None)
 
-inputs = tf.keras.layers.Input(shape=(None, ))
 embeddings = XLNet_model(inputs)[0]
 X = tf.keras.layers.GlobalMaxPooling1D()(embeddings)
 X = tf.keras.layers.BatchNormalization()(X)
