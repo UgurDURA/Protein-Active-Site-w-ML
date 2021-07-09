@@ -10,8 +10,8 @@ import matplotlib.pyplot as plt
 
 MAX_LEN = 256
 BATCH_SIZE = 25 # Possible Values: 4/8/16/32
-DATA_SIZE =1000
-con = sqlite3.connect(r'[DATA]\Enzymes.db')
+DATA_SIZE =200000
+con = sqlite3.connect(r'..\..\[DATA]\Enzymes.db')
 
 dataset = pd.read_sql_query("SELECT ec_number_one, ec_number_two, sequence_string FROM EntriesReady LIMIT ('{0}')".format(DATA_SIZE), con)
 

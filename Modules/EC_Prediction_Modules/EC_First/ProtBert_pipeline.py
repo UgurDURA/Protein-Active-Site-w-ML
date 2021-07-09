@@ -21,8 +21,8 @@ def main():
 
     bert = TFAutoModel.from_pretrained('Rostlab/prot_bert_bfd')
 
-    input_ids = tf.keras.layers.Input(shape=(MAX_LEN,), name='input_ids', dtype='int32')
-    mask = tf.keras.layers.Input(shape=(MAX_LEN,), name='attention_mask', dtype='int32')
+    input_ids = tf.keras.layers.InputLayer(input_shape=(MAX_LEN,), name='input_ids', dtype='int32')
+    mask = tf.keras.layers.InputLayer(input_shape=(MAX_LEN,), name='attention_mask', dtype='int32')
 
     embeddings = bert(input_ids, attention_mask=mask)[0]
 

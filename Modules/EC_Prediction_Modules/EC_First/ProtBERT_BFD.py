@@ -130,6 +130,11 @@ def main():
 
     model.compile(optimizer=optimizer, loss=loss, metrics=[acc])
 
+    json_config = model.get_config()
+    # print this json to file
+    print(json_config)
+    # model.save('./checkpoints/mini_test2/tf_model.h5py')
+
     history = model.fit(
         train,
         validation_data=val,
@@ -138,12 +143,6 @@ def main():
 
     print(history)
 
-    # important problem: throwing NotImplementedError
-    json_config = model.get_config()
-    # print this json to file
-    print(json_config)
-    # model.save('./checkpoints/mini_test2/tf_model.h5py')
-
     tf.keras.models.save_model(
         model, './checkpoints/mini_test2/tf_model.h5', overwrite=True,  save_format='h5',
         save_traces=True)
@@ -151,7 +150,7 @@ def main():
     # directory not saved in git. do not forget to clean up the files here and upload to Gdrive with appropriate name when you successfully run a
     # training and evaluation loop.
 
-    #TODO: fix slicing of the dataset and use trainer API  instead.
+    #TODO: fix slicing of the dataset and use trainer API  instead?
 
     # training_args = TFTrainingArguments(
     #     output_dir='./Results/ProtBERT',  # output directory
