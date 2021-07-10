@@ -31,7 +31,7 @@ def prepare(Requested_sequence):
     tokenizer = AutoTokenizer.from_pretrained('Rostlab/prot_bert_bfd', do_lower_case=False, )
 
     Requested_sequence=re.sub(r"[UZOB]", "X",  Requested_sequence)
-    tokens = tokenizer.encode_plus( Requested_sequence, max_length=256, truncation=True, padding="max_length",
+    tokens = tokenizer(Requested_sequence, max_length=256, truncation=True, padding="max_length",
                                    add_special_tokens=True, return_token_type_ids=False, return_attention_mask=True, return_tensors='tf')
 
     Xids[0, :], Xmask[0, :]  = tokens['input_ids'], tokens['attention_mask']
