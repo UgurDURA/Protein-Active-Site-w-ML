@@ -1,6 +1,6 @@
 import os
 import xml.etree.ElementTree as ET
-
+from ... import *
 
 def process_entry(entry, ns):
     try:
@@ -13,31 +13,30 @@ def process_entry(entry, ns):
         print(e)
 
 
-def fixtag(ns, tag, nsmap):
-    return '{' + nsmap[ns] + '}' + tag
+def main():
+    file_name = UniProt_XML_PATH
+    full_file = os.path.abspath(os.path.join(file_name))
 
+    nsmap = {}
+    seq_counter = 0
+    for event, elem in ET.iterparse(full_file, events=('start', 'end', 'start-ns', 'end-ns')):
+        if event == 'start-ns':
+            ns, url = elem
+            nsmap[ns] = url
 
-file_name = 'uniprot.xml'
-full_file = os.path.abspath(os.path.join(file_name))
+        if event == 'end':
+            if elem.tag == Modules.Utility.xml_parser.fixtag('', 'entry', nsmap):
+                e = int(process_entry(elem, nsmap))
+                if e > 3000:
+                    seq_counter = seq_counter + 1
+                    print(seq_counter)
+                elem.clear()
 
-nsmap = {}
-seq_counter = 0
-for event, elem in ET.iterparse(full_file, events=('start', 'end', 'start-ns', 'end-ns')):
-    if event == 'start-ns':
-        ns, url = elem
-        nsmap[ns] = url
-
-    if event == 'end':
-        if elem.tag == fixtag('', 'entry', nsmap):
-            e = int(process_entry(elem, nsmap))
-            if e > 3000:
-                seq_counter = seq_counter + 1
-                print(seq_counter)
-            elem.clear()
-
-print(seq_counter)
-print('That\'s all folks!')
-
+    print(seq_counter)
+    print('That\'s all folks!')
 
 # max sequence length: 35213
 # 451 entries with sequence length longer than 3000.
+
+if __name__ == "__main__":
+    main()

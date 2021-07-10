@@ -64,5 +64,6 @@ def main():
     con.close()
     mytextfile.close()
 
+
 if __name__ == "__main__":
     main()
