@@ -1,8 +1,20 @@
 # Data Analysis
 import numpy as np
-import matplotlib as plt
+import matplotlib.pyplot as plt
+import pandas as pd
+import sqlite3
+
+con = sqlite3.connect('[DATA]\Enzymes.db')
+dataset = pd.read_sql_query("SELECT sequence_string FROM Entries", con)
+
+
+Sequence=dataset['sequence_string']
+
+
+
 
 def AnalyticsAndGraph(Sequence):
+
 
     count_aminos = {}
     length_seqs = []
@@ -126,3 +138,7 @@ def histogram():
 
     # Show plot
     plt.show()
+
+
+AnalyticsAndGraph(Sequence)
+histogram()
