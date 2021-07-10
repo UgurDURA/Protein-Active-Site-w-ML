@@ -7,11 +7,12 @@ import sqlite3
 import os
 import transformers
 import matplotlib.pyplot as plt
+import re
 
 MAX_LEN = 256
 BATCH_SIZE = 25 # Possible Values: 4/8/16/32
-DATA_SIZE =200000
-con = sqlite3.connect(r'..\..\[DATA]\Enzymes.db')
+DATA_SIZE =500
+con = sqlite3.connect('[DATA]\Enzymes.db')
 
 dataset = pd.read_sql_query("SELECT ec_number_one, ec_number_two, sequence_string FROM EntriesReady LIMIT ('{0}')".format(DATA_SIZE), con)
 
@@ -26,16 +27,22 @@ print("XIDS SHAPE")
 print(Xids.shape)
 
 for i, sequence in enumerate(dataset['sequence_string']):
+
+    sequence=re.sub(r"[UZOB]", "X", sequence)
     tokens = tokenizer.encode_plus(sequence, max_length=MAX_LEN, truncation=True, padding="max_length",
                                    add_special_tokens=True, return_token_type_ids=False, return_attention_mask=True, return_tensors='tf')
 
     Xids[i, :], Xmask[i, :] = tokens['input_ids'], tokens['attention_mask']
 
 print("XIDS")
-print(type(Xids))
+print(Xids[42])
 print("XMASKS")
-print(Xmask)
+print(Xmask[42])
 
+
+plt.plot(Xids[42])
+
+plt.show()
 
 Accumulated_EC=[]
 
@@ -47,14 +54,9 @@ Second_EC_List=list(dataset['ec_number_two'])
 
 A=[[First_EC_List],[Second_EC_List]]
 
-print(First_EC_List)
-print(Second_EC_List)
-
 for i in range (len(dataset['ec_number_one'])):
-    Accumulated_EC.append(int(str(First_EC_List[i])+"666"+ str(Second_EC_List[i])))
+    Accumulated_EC.append((str(First_EC_List[i])+"."+ str(Second_EC_List[i])))
    
-
-print(Accumulated_EC)
  
 
 from numpy import array
@@ -92,7 +94,7 @@ print(labels.shape)
  
 
 print("LABELS")
-print(labels)
+print(labels[42])
 
 # # Below code is for off loading the data
 
@@ -131,7 +133,7 @@ tensorflow_dataset = tensorflow_dataset.map(map_func)
 for i in tensorflow_dataset.take(1):
     print(i)
 
-tensorflow_dataset = tensorflow_dataset.shuffle(100000).batch(4)
+tensorflow_dataset = tensorflow_dataset.shuffle(100000).batch(BATCH_SIZE)
 
 DS_LEN = len(list(tensorflow_dataset))
 
@@ -143,6 +145,7 @@ train = tensorflow_dataset.take(round(DS_LEN * SPLIT))
 val = tensorflow_dataset.skip(round(DS_LEN * SPLIT))
 
 
+
 bert = TFAutoModel.from_pretrained('Rostlab/prot_bert_bfd')
 
 input_ids = tf.keras.layers.Input(shape=(MAX_LEN,), name='input_ids', dtype='int32')
@@ -152,9 +155,9 @@ embeddings = bert(input_ids, attention_mask=mask)[0]
 
 X = tf.keras.layers.GlobalMaxPooling1D()(embeddings)
 X = tf.keras.layers.BatchNormalization()(X)
-X = tf.keras.layers.Dense(128, activation='sigmoid')(X) 
+X = tf.keras.layers.Dense(256, activation='sigmoid')(X) 
 X = tf.keras.layers.Dropout(0.1)(X)
-X = tf.keras.layers.Dense(64, activation='sigmoid')(X)
+X = tf.keras.layers.Dense(128, activation='sigmoid')(X)
 y = tf.keras.layers.Dense((ArraySize), activation='sigmoid', name='outputs')(X)
 
 model = tf.keras.Model(inputs=[input_ids, mask], outputs=[y])
@@ -171,5 +174,7 @@ model.compile(optimizer=optimizer, loss=loss, metrics=[acc])
 history = model.fit(
     train,
     validation_data=val,
-    epochs=25,
+    epochs=5,
 )
+
+plot_history(['2nd EC',history])
