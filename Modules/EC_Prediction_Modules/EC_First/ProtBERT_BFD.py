@@ -1,6 +1,8 @@
 import numpy as np
 import pandas as pd
-from transformers import AutoTokenizer, TFAutoModel, TFBertModel
+
+from Modules.EC_Prediction_Modules.EC_First.model_init import *
+from .... import *
 from Modules.Utility.data_manipulation import map_func
 
 import tensorflow as tf
@@ -19,7 +21,7 @@ def main():
 
     print('eager execution: ', tf.executing_eagerly())
 
-    tokenizer = AutoTokenizer.from_pretrained('Rostlab/prot_bert_bfd', do_lower_case=False)
+    tokenizer = create_tokenizer("ProtBERT_BFD")
 
     Xids = np.zeros((len(dataset), MAX_LEN))
     Xmask = np.zeros((len(dataset), MAX_LEN))
@@ -89,28 +91,7 @@ def main():
     train = tensorflow_dataset.take(round(DS_LEN * SPLIT))
     val = tensorflow_dataset.skip(round(DS_LEN * SPLIT))
 
-    # acrobatics to avoid putting a model inside a model in keras which is discouraged, and prevents saving the model
-    # config = BertConfig.from_pretrained('Rostlab/prot_bert_bfd')
-    bert = TFAutoModel.from_pretrained('Rostlab/prot_bert_bfd')
-    assert isinstance(bert, TFBertModel)
-    main_layer = bert.bert
-    del bert
-
-    input_ids = tf.keras.layers.Input(shape=(MAX_LEN,), name='input_ids', dtype='int64')
-    mask = tf.keras.layers.Input(shape=(MAX_LEN,), name='attention_mask', dtype='int64')
-
-    embeddings = main_layer(input_ids, attention_mask=mask)
-
-    X = tf.keras.layers.GlobalMaxPooling1D()(embeddings)
-    X = tf.keras.layers.BatchNormalization()(X)
-    X = tf.keras.layers.Dense(64, activation='relu')(X)
-    X = tf.keras.layers.Dropout(0.1)(X)
-    X = tf.keras.layers.Dense(16, activation='relu')(X)
-    y = tf.keras.layers.Dense(categories, activation='softmax', name='outputs')(X)
-
-    model = tf.keras.Model(inputs=(input_ids, mask), outputs=[y])
-
-    model.layers[2].trainable = False
+    model = create_model(embedding_base="ProtBERT_BFD", categories=categories)
     model.summary()
 
     optimizer = tf.keras.optimizers.Adam(0.01)
