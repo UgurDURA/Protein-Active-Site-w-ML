@@ -4,7 +4,8 @@ sys.path.append('../../')
 from Modules.Utility.data_manipulation import map_func
 import numpy as np
 import pandas as pd
-from transformers import AutoTokenizer, TFAutoModel, TFTrainingArguments, TFTrainer
+from transformers import AutoTokenizer, TFBertMainLayer, TFAutoModel, \
+    TFTrainingArguments, TFTrainer, BertConfig, TFBertModel
 
 import tensorflow as tf
 import sqlite3
@@ -25,37 +26,33 @@ def main():
 
     print('eager execution: ', tf.executing_eagerly())
 
-    tokenizer = AutoTokenizer.from_pretrained('Rostlab/prot_bert_bfd', do_lower_case=False, )
+    tokenizer = AutoTokenizer.from_pretrained('Rostlab/prot_bert_bfd', do_lower_case=False)
 
     Xids = np.zeros((len(dataset), MAX_LEN))
     Xmask = np.zeros((len(dataset), MAX_LEN))
-    #
+
     # print("XIDS SHAPE")
     # print(Xids.shape)
 
     # print(dataset['sequence_string'])
 
-    tokens = []
+    # tokens = []
     for i, sequence in enumerate(dataset['sequence_string']):
-        tokens = (tokenizer(sequence[1], max_length=MAX_LEN, truncation=True, padding="max_length", add_special_tokens=True,
+        tokens = (tokenizer(sequence, max_length=MAX_LEN, truncation=True, padding="max_length", add_special_tokens=True,
                                 return_token_type_ids=False, return_attention_mask=True, return_tensors='tf'))
         Xids[i, :], Xmask[i, :] = tokens['input_ids'], tokens['attention_mask']
 
-    print("XIDS: ", type(Xids))
-    print("XMASKS: ", type(Xmask))
+    print("XIDS shape: ", Xids.shape)
+    print("XMASKS shape: ", Xmask.shape)
 
     ecnumbers = dataset['ec_number_one']
-
     print("unique ec numbers: ", ecnumbers.unique())
-    arr = ecnumbers.values
+    ec_arr = ecnumbers.values
 
-    print("Array Size: ", arr.size)
-
-    labels = np.zeros((arr.size, arr.max() + 1))
-
+    categories = ecnumbers.unique().size + 1
+    labels = np.zeros((ec_arr.size, categories))
     print("Labels Shape", labels.shape)
-
-    labels[np.arange(arr.size), arr] = 1  #effectively one hot encoding.
+    labels[np.arange(ec_arr.size), ec_arr] = 1  #effectively one hot encoding.
 
     # print("LABELS")
     # print(labels)
@@ -82,9 +79,10 @@ def main():
 
     tensorflow_dataset = tf.data.Dataset.from_tensor_slices((Xids, Xmask, labels))
 
-    # print("DATASET ON TENSOR FLOW EXAMPLE")
-    # for i in tensorflow_dataset.take(1):
-    #     print(i)
+    print("TENSOR FLOW DATASET, 1 EXAMPLE")
+    for i in tensorflow_dataset.take(1):
+        print(i)
+
     DS_LEN = int(tensorflow_dataset.__len__())  # cast as int because returns EagerTensor for some reason
     print("dataset length: ", DS_LEN)
     SPLIT = .9
@@ -98,28 +96,25 @@ def main():
     train = tensorflow_dataset.take(round(DS_LEN * SPLIT))
     val = tensorflow_dataset.skip(round(DS_LEN * SPLIT))
 
-    # all above code is not working as we want it to.
-    # TODO: custom huggingface Dataset OR fix up the TF dataset obj
-
-    # ValueError: Data of type < class 'tensorflow.python.keras.engine.input_layer.InputLayer'> is not allowed only ( < class
-    # 'tensorflow.python.framework.ops.Tensor'>, < class 'bool' >, < class 'int' >, < class 'transformers.file_utils.ModelOutput' >,
-    # < class 'tuple' >, < class 'list' >, < class 'dict' >, < class 'numpy.ndarray' > ) is accepted for attention_mask.
-
+    # acrobatics to avoid putting a model inside a model in keras which is discouraged, and prevents saving the model
+    config = BertConfig.from_pretrained('Rostlab/prot_bert_bfd')
     bert = TFAutoModel.from_pretrained('Rostlab/prot_bert_bfd')
+    assert isinstance(bert, TFBertModel)
+    main_layer = bert.bert
 
-    input_ids = tf.keras.layers.InputLayer(input_shape=(MAX_LEN,), name='input_ids', dtype='int32')
-    mask = tf.keras.layers.InputLayer(input_shape=(MAX_LEN,), name='attention_mask', dtype='int32')
+    input_ids = tf.keras.layers.Input(shape=(MAX_LEN,), name='input_ids', dtype='int64')
+    mask = tf.keras.layers.Input(shape=(MAX_LEN,), name='attention_mask', dtype='int64')
 
-    embeddings = bert(input_ids, attention_mask=mask)[0]
+    embeddings = main_layer(input_ids, attention_mask=mask)
 
     X = tf.keras.layers.GlobalMaxPooling1D()(embeddings)
     X = tf.keras.layers.BatchNormalization()(X)
     X = tf.keras.layers.Dense(64, activation='relu')(X)
     X = tf.keras.layers.Dropout(0.1)(X)
     X = tf.keras.layers.Dense(16, activation='relu')(X)
-    y = tf.keras.layers.Dense(arr.max() + 1, activation='softmax', name='outputs')(X)
+    y = tf.keras.layers.Dense(categories, activation='softmax', name='outputs')(X)
 
-    model = tf.keras.Model(inputs=[input_ids, mask], outputs=[y])
+    model = tf.keras.Model(inputs=(input_ids, mask), outputs=[y])
 
     model.layers[2].trainable = False
     model.summary()
@@ -130,10 +125,10 @@ def main():
 
     model.compile(optimizer=optimizer, loss=loss, metrics=[acc])
 
-    json_config = model.get_config()
-    # print this json to file
-    print(json_config)
-    # model.save('./checkpoints/mini_test2/tf_model.h5py')
+    # json_config = model.get_config()
+    # # print this json to file
+    # print(json_config)
+    # # model.save('./checkpoints/mini_test2/tf_model.h5py')
 
     history = model.fit(
         train,
