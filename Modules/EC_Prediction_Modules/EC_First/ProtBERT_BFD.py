@@ -1,18 +1,11 @@
-import sys
-
-sys.path.append('../../')
-from Modules.Utility.data_manipulation import map_func
 import numpy as np
 import pandas as pd
-from transformers import AutoTokenizer, TFBertMainLayer, TFAutoModel, \
-    TFTrainingArguments, TFTrainer, BertConfig, TFBertModel
+from transformers import AutoTokenizer, TFAutoModel, TFBertModel
+from Modules.Utility.data_manipulation import map_func
 
 import tensorflow as tf
 import sqlite3
 
-MAX_LEN = 512
-BATCH_SIZE = 16  # Possible Values: 4/8/16/32
-DATA_SIZE = 50
 
 
 # TODO: configure here to read args from cmmndline, set defaults
@@ -97,10 +90,11 @@ def main():
     val = tensorflow_dataset.skip(round(DS_LEN * SPLIT))
 
     # acrobatics to avoid putting a model inside a model in keras which is discouraged, and prevents saving the model
-    config = BertConfig.from_pretrained('Rostlab/prot_bert_bfd')
+    # config = BertConfig.from_pretrained('Rostlab/prot_bert_bfd')
     bert = TFAutoModel.from_pretrained('Rostlab/prot_bert_bfd')
     assert isinstance(bert, TFBertModel)
     main_layer = bert.bert
+    del bert
 
     input_ids = tf.keras.layers.Input(shape=(MAX_LEN,), name='input_ids', dtype='int64')
     mask = tf.keras.layers.Input(shape=(MAX_LEN,), name='attention_mask', dtype='int64')

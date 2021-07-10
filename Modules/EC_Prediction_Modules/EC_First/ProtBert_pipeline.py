@@ -21,27 +21,27 @@ def main():
 
     bert = TFAutoModel.from_pretrained('Rostlab/prot_bert_bfd')
 
-    input_ids = tf.keras.layers.InputLayer(input_shape=(MAX_LEN,), name='input_ids', dtype='int32')
-    mask = tf.keras.layers.InputLayer(input_shape=(MAX_LEN,), name='attention_mask', dtype='int32')
+    input_ids = tf.keras.layers.Input(shape=(MAX_LEN,), name='input_ids', dtype='int64')
+    mask = tf.keras.layers.Input(shape=(MAX_LEN,), name='attention_mask', dtype='int64')
 
     embeddings = bert(input_ids, attention_mask=mask)[0]
 
     X = tf.keras.layers.GlobalMaxPooling1D()(embeddings)
     X = tf.keras.layers.BatchNormalization()(X)
-    X = tf.keras.layers.Dense(128, activation='relu')(X)
+    X = tf.keras.layers.Dense(64, activation='relu')(X)
     X = tf.keras.layers.Dropout(0.1)(X)
-    X = tf.keras.layers.Dense(32, activation='relu')(X)
-    y = tf.keras.layers.Dense(8, activation='softmax', name='outputs')(X)
+    X = tf.keras.layers.Dense(16, activation='relu')(X)
+    y = tf.keras.layers.Dense(6, activation='softmax', name='outputs')(X)
 
     bert = tf.keras.Model(inputs=[input_ids, mask], outputs=[y])
 
-    bert.load_weights('./checkpoints/mini_test/weights.h5')
+    bert.load_weights('./checkpoints/mini_test2/tf_model.h5')
 
     # TODO: load the tokenizer and the pretrained model from (checkpoints directory)
     tokenizer = AutoTokenizer.from_pretrained('Rostlab/prot_bert_bfd', do_lower_case=False, )
     # bert = TFAutoModelForSequenceClassification.from_pretrained('./checkpoints/mini_test/weights.h5', from_pt=True)
     #
-    pipeline = TextClassificationPipeline(task="text-classification", model=bert, tokenizer=tokenizer, device=0, framework='tf')
+    pipeline = TextClassificationPipeline(model=bert, tokenizer=tokenizer, device=0, framework='tf', task="first EC number prediction")
     # TODO: change device to read from cuda apis
 
     seq = 'M E N H S K Q T E A P H P G T Y M P A G Y P P P Y P P A A F Q G P S D H A A Y P I P Q A G Y Q G P P G P Y P G P Q P G Y P V P P G G Y A G G ' \
