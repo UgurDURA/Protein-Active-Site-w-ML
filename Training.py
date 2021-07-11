@@ -30,7 +30,7 @@ for i, sequence in enumerate(dataset['sequence_string']):
 
     sequence=re.sub(r"[UZOB]", "X", sequence)
     tokens = tokenizer.encode_plus(sequence, max_length=MAX_LEN, truncation=True, padding="max_length",
-                                   add_special_tokens=True, return_token_type_ids=False, return_attention_mask=True, return_tensors='tf')
+                                   add_special_tokens=False, return_token_type_ids=False, return_attention_mask=True, return_tensors='tf')
 
     Xids[i, :], Xmask[i, :] = tokens['input_ids'], tokens['attention_mask']
 
@@ -121,12 +121,13 @@ for i, sequence in enumerate(dataset['sequence_string']):
 
 
 arr=dataset['ec_number_one']
+categories = arr.unique().size
 
-labels=np.zeros((arr.size, arr.max()+1))
+labels=np.zeros((arr.size, categories))
 
-labels[np.arange(arr.size),arr]=1
+labels[np.arange(arr.size), arr-1] = 1
 
-
+print(labels)
 
 
 
