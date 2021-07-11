@@ -173,10 +173,10 @@ embeddings = bert.bert(input_ids, attention_mask=mask)
 
 X = tf.keras.layers.GlobalMaxPooling1D()(embeddings)
 X = tf.keras.layers.BatchNormalization()(X)
-X = tf.keras.layers.Dense(128, activation='relu')(X) 
+X = tf.keras.layers.Dense(128, activation='relu')(X) # regularizer here?
 X = tf.keras.layers.Dropout(0.1)(X)
 X = tf.keras.layers.Dense(32, activation='relu')(X)
-y = tf.keras.layers.Dense((8), activation='softmax', name='outputs')(X)
+y = tf.keras.layers.Dense((categories), activation='softmax', name='outputs')(X)
 
 model = tf.keras.Model(inputs=[input_ids, mask], outputs=[y])
 
