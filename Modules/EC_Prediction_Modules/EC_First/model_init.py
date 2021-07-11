@@ -2,7 +2,7 @@ from transformers import AutoTokenizer, TFAutoModel, TFBertModel, XLNetTokenizer
 import tensorflow as tf
 from .... import *
 
-def create_model(**kwargs):
+def create_model(n_dense1=64, n_dense2=16,dout_rate=0.1, ** kwargs):
     embedding_base = kwargs.embedding_base      # specify ProtBERT_BFD or XLNET
     categories = kwargs.categories              # number of labels
 
@@ -17,7 +17,7 @@ def create_model(**kwargs):
 
         embeddings = main_layer(input_ids, attention_mask=mask)
 
-    elif embedding_base == "XLNET":
+    elif embedding_base == "XLNET":     # TODO: probably needs debugging
         base = TFAutoModel.from_pretrained("Rostlab/prot_xlnet", from_pt=True)
         assert isinstance(base, TFXLNetForSequenceClassification)
         main_layer = base.xlnet
@@ -26,15 +26,15 @@ def create_model(**kwargs):
         embeddings = main_layer(inputs)[0]
 
     else:
-        print("invalid arg")
+        print("create_model(): invalid arg")
         # throw error
     del base
 
     X = tf.keras.layers.GlobalMaxPooling1D()(embeddings)
     X = tf.keras.layers.BatchNormalization()(X)
-    X = tf.keras.layers.Dense(64, activation='relu')(X)
-    X = tf.keras.layers.Dropout(0.1)(X)
-    X = tf.keras.layers.Dense(16, activation='relu')(X)
+    X = tf.keras.layers.Dense(n_dense1, activation='relu')(X)
+    X = tf.keras.layers.Dropout(dout_rate)(X)
+    X = tf.keras.layers.Dense(n_dense2, activation='relu')(X)
     y = tf.keras.layers.Dense(categories, activation='softmax', name='outputs')(X)
     # if you are going to adjust the inner workings of the classification head, do so here.
 
@@ -49,6 +49,6 @@ def create_tokenizer(model):
     elif model == "XLNET":
         tokenizer = XLNetTokenizer.from_pretrained("Rostlab/prot_xlnet", do_lower_case=False)
     else:
-        print("invalid arg")
+        print("create_model(): invalid arg")
         # throw error
     return tokenizer

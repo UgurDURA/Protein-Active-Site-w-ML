@@ -8,12 +8,17 @@ from Modules.Utility.data_manipulation import map_func
 import tensorflow as tf
 import sqlite3
 
+"""
+primary script to train EC number classification task on only the first digit.
+specify in main args whether to instantiate a Bert or XLNet pretrained model as embedding layer.
+"""
 
 
 # TODO: configure here to read args from cmmndline, set defaults
+
 def main():
     # read data from Enzymes.db, put it into dataset container
-    con = sqlite3.connect(r'..\..\..\[DATA]\Enzymes.db')
+    con = sqlite3.connect(SQLite_DB_PATH)
 
     # remove LIMIT if you want the entire dataset.
     dataset = pd.read_sql_query("SELECT ec_number_one, sequence_string FROM EntriesReady LIMIT ('{0}')".format(DATA_SIZE), con)
@@ -33,8 +38,8 @@ def main():
 
     # tokens = []
     for i, sequence in enumerate(dataset['sequence_string']):
-        tokens = (tokenizer(sequence, max_length=MAX_LEN, truncation=True, padding="max_length", add_special_tokens=True,
-                                return_token_type_ids=False, return_attention_mask=True, return_tensors='tf'))
+        tokens = (tokenizer(sequence, max_length=MAX_LEN, truncation=True, padding="max_length", add_special_tokens=True, return_token_type_ids=False,
+                            return_attention_mask=True, return_tensors='tf'))
         Xids[i, :], Xmask[i, :] = tokens['input_ids'], tokens['attention_mask']
 
     print("XIDS shape: ", Xids.shape)
@@ -47,7 +52,7 @@ def main():
     categories = ecnumbers.unique().size + 1
     labels = np.zeros((ec_arr.size, categories))
     print("Labels Shape", labels.shape)
-    labels[np.arange(ec_arr.size), ec_arr] = 1  #effectively one hot encoding.
+    labels[np.arange(ec_arr.size), ec_arr] = 1  # effectively one hot encoding.
 
     # print("LABELS")
     # print(labels)
@@ -120,7 +125,7 @@ def main():
     # directory not saved in git. do not forget to clean up the files here and upload to Gdrive with appropriate name when you successfully run a
     # training and evaluation loop.
 
-    #TODO: fix slicing of the dataset and use trainer API  instead?
+    # TODO: fix slicing of the dataset and use trainer API  instead?
 
     # training_args = TFTrainingArguments(
     #     output_dir='./Results/ProtBERT',  # output directory

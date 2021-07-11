@@ -50,25 +50,30 @@ def fixtag(ns, tag, nsmap):
 # [DATA]/uniprot/uniprot_sprot.xml contains all the manually annotated entries wth ec number from uniprot. 271,464 entries, read  into db.
 
 
-full_file = os.path.abspath(os.path.join(UniProt_XML_PATH))
+def main():
+    full_file = os.path.abspath(os.path.join(UniProt_XML_PATH))
 
-nsmap = {}
+    nsmap = {}
 
-for event, elem in ET.iterparse(full_file, events=('start', 'end', 'start-ns', 'end-ns')):
-    if event == 'start-ns':
-        ns, url = elem
-        nsmap[ns] = url
+    for event, elem in ET.iterparse(full_file, events=('start', 'end', 'start-ns', 'end-ns')):
+        if event == 'start-ns':
+            ns, url = elem
+            nsmap[ns] = url
 
-    if event == 'end':
-        if elem.tag == fixtag('', 'entry', nsmap):
-            process_entry(elem, nsmap)
-            print(elem)
+        if event == 'end':
+            if elem.tag == fixtag('', 'entry', nsmap):
+                process_entry(elem, nsmap)
+                print(elem)
 
-            elem.clear()
+                elem.clear()
 
-print('That\'s all folks!')
+    print('That\'s all folks!')
 
-cur.close()
+    cur.close()
 
-# for row in cur.execute('SELECT * FROM Entries'):
-#     print(row)
+    # for row in cur.execute('SELECT * FROM Entries'):
+    #     print(row)
+
+
+if __name__ == "__main__":
+    main()
