@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 import sqlite3
-
+from matplotlib import colors
 con = sqlite3.connect('[DATA]\Enzymes.db')
 dataset = pd.read_sql_query("SELECT sequence_string FROM Entries", con)
 
@@ -11,10 +11,7 @@ dataset = pd.read_sql_query("SELECT sequence_string FROM Entries", con)
 Sequence=dataset['sequence_string']
 
 
-
-
-def SequenceAnalytics(Sequence):
-
+def AnalyticsCalculations(Sequence):
 
     count_aminos = {}
     length_seqs = []
@@ -26,7 +23,22 @@ def SequenceAnalytics(Sequence):
             else:
                 count_aminos[a] = 0
 
+    return count_aminos, length_seqs
+
+
+
+
+def SequenceAnalytics(Sequence):
+
+    count_aminos = {}
+    length_seqs = []
+
+    count_aminos, length_seqs = AnalyticsCalculations(Sequence)
+     
     unique_aminos = list(count_aminos.keys())
+
+
+    print('---------------------------------Amino Acids Analytics-------------------------------------')
 
     print('Unique aminos ({}):\n{}'.format(len(unique_aminos), unique_aminos))
     x = [i for i in range(len(unique_aminos))]
@@ -49,10 +61,12 @@ def SequenceAnalytics(Sequence):
 
 def histogram(Sequence):
 
-    length_seqs=SequenceAnalytics(Sequence)
+    length_seqs = []
 
 
+    print('---------------------------------Sequence Length Distribution-------------------------------------')
 
+    count_aminos, length_seqs = AnalyticsCalculations(Sequence)
     sorted_seqs = np.array(length_seqs)
     sorted_seqs.sort()
     print('10 shortest:\n{}\n10 longest:\n{}'.format(sorted_seqs[:10], sorted_seqs[-10:]))
@@ -62,30 +76,6 @@ def histogram(Sequence):
     print('Number sequences more than 500 AA:', len(sorted_seqs[sorted_seqs > 500]))
     print('Number sequences more than 1000 AA:', len(sorted_seqs[sorted_seqs > 1000]))
 
-    # density={}
-
-    # for i in range(np.max(length_seqs)):
-    #     lower=len(sorted_seqs[sorted_seqs<i])
-    #     upper=len(sorted_seqs[sorted_seqs>i+2])
-
-    #     print ("Lower  ",lower,"    ","Upper   ",upper,"       ","Sequence Length",np.max(length_seqs))
-
-    #     calc=(SequenceSize)-abs(lower)-abs(upper)
-    #     calc=abs(calc)
-
-    #     density[i]=calc
-    #     # print(i, " / ", np.max(length_seqs))
-
-    # lists = sorted(density.items()) # sorted by key, return a list of tuples
-    # print(density)
-    # x, y = zip(*lists) # unpack a list of pairs into two tuples
-
-    # plt.plot(x, y)
-    # plt.xlabel('Number of Sequencees')
-    # plt.ylabel('The Length of the Sequence')
-    # plt.title('Sequence Size Distribution')
-
-    # plt.show()
     Optimized_length_seq = []
 
     for item in length_seqs:
