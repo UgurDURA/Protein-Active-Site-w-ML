@@ -1,34 +1,33 @@
-import numpy as np
-import pandas as pd
-from Modules import *
-from Modules.Model_Spec import model_init
-from Modules.Utility.data_manipulation import map_func
-
-import tensorflow as tf
-import sqlite3
-
 """
 primary script to train EC number classification task on only the first digit.
 specify in main args whether to instantiate a Bert or XLNet pretrained model as embedding layer.
 """
+
+from Modules.Model_Spec import model_init, defaults     # use this to import default values in any runnable
+from Modules.Utility.data_manipulation import map_func
+
+import numpy as np
+import pandas as pd
+import tensorflow as tf
+import sqlite3
 
 
 # TODO: configure here to read args from cmmndline, set defaults
 
 def main():
     # read data from Enzymes.db, put it into dataset container
-    con = sqlite3.connect(SQLite_DB_PATH)
+    con = sqlite3.connect(defaults.SQLite_DB_PATH)
 
     # remove LIMIT if you want the entire dataset.
-    dataset = pd.read_sql_query("SELECT ec_number_one, sequence_string FROM EntriesReady LIMIT ('{0}')".format(DATA_SIZE), con)
+    dataset = pd.read_sql_query("SELECT ec_number_one, sequence_string FROM EntriesReady LIMIT ('{0}')".format(defaults.DATA_SIZE), con)
     # DataFrame object holding our dataset.
 
     print('eager execution: ', tf.executing_eagerly())
 
     tokenizer = model_init.create_tokenizer("ProtBERT_BFD")
 
-    Xids = np.zeros((len(dataset), MAX_LEN))
-    Xmask = np.zeros((len(dataset), MAX_LEN))
+    Xids = np.zeros((len(dataset), defaults.MAX_LEN))
+    Xmask = np.zeros((len(dataset), defaults.MAX_LEN))
 
     # print("XIDS SHAPE")
     # print(Xids.shape)
@@ -37,8 +36,8 @@ def main():
 
     # tokens = []
     for i, sequence in enumerate(dataset['sequence_string']):
-        tokens = (tokenizer(sequence, max_length=MAX_LEN, truncation=True, padding="max_length", add_special_tokens=True, return_token_type_ids=False,
-                            return_attention_mask=True, return_tensors='tf'))
+        tokens = (tokenizer(sequence, max_length=defaults.MAX_LEN, truncation=True, padding="max_length", add_special_tokens=True,
+                            return_token_type_ids=False, return_attention_mask=True, return_tensors='tf'))
         Xids[i, :], Xmask[i, :] = tokens['input_ids'], tokens['attention_mask']
 
     print("XIDS shape: ", Xids.shape)
@@ -91,11 +90,11 @@ def main():
     # for i in tensorflow_dataset.take(1):
     #     print(i)
 
-    tensorflow_dataset = tensorflow_dataset.shuffle(42).batch(BATCH_SIZE)
+    tensorflow_dataset = tensorflow_dataset.shuffle(42).batch(defaults.BATCH_SIZE)
     train = tensorflow_dataset.take(round(DS_LEN * SPLIT))
     val = tensorflow_dataset.skip(round(DS_LEN * SPLIT))
 
-    model = model_init.create_model(embedding_base="ProtBERT_BFD", categories=categories)
+    model = model_init.create_model(embedding_base="ProtBERT_BFD", categories=categories, max_len=defaults.MAX_LEN)
     model.summary()
 
     optimizer = tf.keras.optimizers.Adam(0.01)

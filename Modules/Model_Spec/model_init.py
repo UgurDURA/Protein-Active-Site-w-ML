@@ -1,6 +1,7 @@
+from Modules.Model_Spec import defaults
+
 from transformers import AutoTokenizer, TFAutoModel, TFBertModel, XLNetTokenizer, TFXLNetForSequenceClassification
 import tensorflow as tf
-from ... import *
 
 def create_model(n_dense1=64, n_dense2=16,dout_rate=0.1, ** kwargs):
     embedding_base = kwargs.embedding_base      # specify ProtBERT_BFD or XLNET
@@ -8,12 +9,18 @@ def create_model(n_dense1=64, n_dense2=16,dout_rate=0.1, ** kwargs):
 
     # acrobatics to avoid putting a model inside a model in keras which prevents saving the model
     if embedding_base == "ProtBERT_BFD":
+        if kwargs.max_len:
+            assert isinstance(kwargs.max_len, int)
+            max_len = kwargs.max_len
+        else:
+            max_len = defaults.MAX_LEN
+
         base = TFAutoModel.from_pretrained('Rostlab/prot_bert_bfd')
         assert isinstance(base, TFBertModel)
         main_layer = base.bert
 
-        input_ids = tf.keras.layers.Input(shape=(MAX_LEN,), name='input_ids', dtype='int32')
-        mask = tf.keras.layers.Input(shape=(MAX_LEN,), name='attention_mask', dtype='int32')
+        input_ids = tf.keras.layers.Input(shape=(max_len,), name='input_ids', dtype='int32')
+        mask = tf.keras.layers.Input(shape=(max_len,), name='attention_mask', dtype='int32')
 
         embeddings = main_layer(input_ids, attention_mask=mask)[0]
 
@@ -22,7 +29,7 @@ def create_model(n_dense1=64, n_dense2=16,dout_rate=0.1, ** kwargs):
         assert isinstance(base, TFXLNetForSequenceClassification)
         main_layer = base.xlnet
 
-        inputs = tf.keras.layers.Input(shape=None, name="input layer", ragged=True, type_spec=None)
+        inputs = tf.keras.layers.Input(shape=None, name="input layer", ragged=True)
         embeddings = main_layer(inputs)[0]
 
     else:

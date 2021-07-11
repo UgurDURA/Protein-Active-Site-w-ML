@@ -3,8 +3,8 @@ scriptlet to divide and preprocess the entries in our database.
 as preprocessing, spaces are added inbetween every token in a sequence : addSpaces();
 additionally, EC numbers are divided into the digits by seperator '.' : ECnumberSeperator
 '''
-
-from ... import *
+import sqlite3
+from Modules.Model_Spec import defaults
 
 # simple functions to add space between AA sequences, and seperating the EC numbers:
 
@@ -33,7 +33,7 @@ def map_func(input_ids, masks, labels):
 
 def main():
 
-    con = sqlite3.connect(SQLite_DB_PATH)
+    con = sqlite3.connect(defaults.SQLite_DB_PATH)
     cur1 = con.cursor()
     cur2 = con.cursor()
 

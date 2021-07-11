@@ -1,1 +1,2 @@
-# empty for now
+
+__all__ = ["model_init"]

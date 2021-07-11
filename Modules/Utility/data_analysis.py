@@ -3,23 +3,18 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 import sqlite3
-from ... import *
+from Modules.Model_Spec import defaults
 
-con = sqlite3.connect(SQLite_DB_PATH)
+con = sqlite3.connect(defaults.SQLite_DB_PATH)
 dataset = pd.read_sql_query("SELECT sequence_string FROM Entries", con)
-
 
 Sequence = dataset['sequence_string']
 
 
-
-
-def AnalyticsAndGraph(Sequence):
-
-
+def AnalyticsAndGraph(sequence):
     count_aminos = {}
     length_seqs = []
-    for i, seq in enumerate(Sequence):
+    for i, seq in enumerate(sequence):
         length_seqs.append(len(seq))
         for a in seq:
             if a in count_aminos:
@@ -46,100 +41,102 @@ def AnalyticsAndGraph(Sequence):
     print('Min length:', np.min(length_seqs))
     print('Max length:', np.max(length_seqs))
 
-def histogram():
+# def histogram():
+#
+#     sorted_seqs = np.array(length_seqs)
+#     sorted_seqs.sort()
+#     print('10 shortest:\n{}\n10 longest:\n{}'.format(sorted_seqs[:10], sorted_seqs[-10:]))
+#
+#     print("Number of Sequences: ", SequenceSize)
+#     print('Number sequences less than 30 AA:', len(sorted_seqs[sorted_seqs < 30]))
+#     print('Number sequences more than 500 AA:', len(sorted_seqs[sorted_seqs > 500]))
+#     print('Number sequences more than 1000 AA:', len(sorted_seqs[sorted_seqs > 1000]))
+#
+#     # density={}
+#
+#     # for i in range(np.max(length_seqs)):
+#     #     lower=len(sorted_seqs[sorted_seqs<i])
+#     #     upper=len(sorted_seqs[sorted_seqs>i+2])
+#
+#     #     print ("Lower  ",lower,"    ","Upper   ",upper,"       ","Sequence Length",np.max(length_seqs))
+#
+#     #     calc=(SequenceSize)-abs(lower)-abs(upper)
+#     #     calc=abs(calc)
+#
+#     #     density[i]=calc
+#     #     # print(i, " / ", np.max(length_seqs))
+#
+#     # lists = sorted(density.items()) # sorted by key, return a list of tuples
+#     # print(density)
+#     # x, y = zip(*lists) # unpack a list of pairs into two tuples
+#
+#     # plt.plot(x, y)
+#     # plt.xlabel('Number of Sequencees')
+#     # plt.ylabel('The Length of the Sequence')
+#     # plt.title('Sequence Size Distribution')
+#
+#     # plt.show()
+#     Optimized_length_seq = []
+#
+#     for item in length_seqs:
+#         if (item < 1000):
+#             Optimized_length_seq.append(item)
+#
+#     N_points = 10000
+#     n_bins = 200
+#     legend = ['distribution']
+#
+#     fig, axs = plt.subplots(1, 1,
+#                             figsize=(10, 7),
+#                             tight_layout=True)
+#
+#     # Remove axes splines
+#     for s in ['top', 'bottom', 'left', 'right']:
+#         axs.spines[s].set_visible(False)
+#
+#         # Remove x, y ticks
+#     axs.xaxis.set_ticks_position('none')
+#     axs.yaxis.set_ticks_position('none')
+#
+#     # Add padding between axes and labels
+#     axs.xaxis.set_tick_params(pad=5)
+#     axs.yaxis.set_tick_params(pad=10)
+#
+#     # Add x, y gridlines
+#     axs.grid(b=True, color='grey',
+#              linestyle='-.', linewidth=0.5,
+#              alpha=0.6)
+#
+#     # Add Text watermark
+#     fig.text(0.9, 0.15, 'Proten Function Prediction',
+#              fontsize=12,
+#              color='red',
+#              ha='right',
+#              va='bottom',
+#              alpha=0.7)
+#
+#     # Creating histogram
+#     N, bins, patches = axs.hist(Optimized_length_seq, bins=n_bins)
+#
+#     # Setting color
+#     fracs = ((N ** (1 / 5)) / N.max())
+#     norm = colors.Normalize(fracs.min(), fracs.max())
+#
+#     for thisfrac, thispatch in zip(fracs, patches):
+#         color = plt.cm.viridis(norm(thisfrac))
+#         thispatch.set_facecolor(color)
+#
+#     # Adding extra features
+#     plt.xlabel("Sequence Length")
+#     plt.ylabel("Number of Sequences")
+#     plt.legend(legend)
+#     plt.title('Sequence Length Distribution')
+#
+#     # Show plot
+#     plt.show()
 
-    sorted_seqs = np.array(length_seqs)
-    sorted_seqs.sort()
-    print('10 shortest:\n{}\n10 longest:\n{}'.format(sorted_seqs[:10], sorted_seqs[-10:]))
 
-    print("Number of Sequences: ", SequenceSize)
-    print('Number sequences less than 30 AA:', len(sorted_seqs[sorted_seqs < 30]))
-    print('Number sequences more than 500 AA:', len(sorted_seqs[sorted_seqs > 500]))
-    print('Number sequences more than 1000 AA:', len(sorted_seqs[sorted_seqs > 1000]))
+def main():
 
-    # density={}
-
-    # for i in range(np.max(length_seqs)):
-    #     lower=len(sorted_seqs[sorted_seqs<i])
-    #     upper=len(sorted_seqs[sorted_seqs>i+2])
-
-    #     print ("Lower  ",lower,"    ","Upper   ",upper,"       ","Sequence Length",np.max(length_seqs))
-
-    #     calc=(SequenceSize)-abs(lower)-abs(upper)
-    #     calc=abs(calc)
-
-    #     density[i]=calc
-    #     # print(i, " / ", np.max(length_seqs))
-
-    # lists = sorted(density.items()) # sorted by key, return a list of tuples
-    # print(density)
-    # x, y = zip(*lists) # unpack a list of pairs into two tuples
-
-    # plt.plot(x, y)
-    # plt.xlabel('Number of Sequencees')
-    # plt.ylabel('The Length of the Sequence')
-    # plt.title('Sequence Size Distribution')
-
-    # plt.show()
-    Optimized_length_seq = []
-
-    for item in length_seqs:
-        if (item < 1000):
-            Optimized_length_seq.append(item)
-
-    N_points = 10000
-    n_bins = 200
-    legend = ['distribution']
-
-    fig, axs = plt.subplots(1, 1,
-                            figsize=(10, 7),
-                            tight_layout=True)
-
-    # Remove axes splines
-    for s in ['top', 'bottom', 'left', 'right']:
-        axs.spines[s].set_visible(False)
-
-        # Remove x, y ticks
-    axs.xaxis.set_ticks_position('none')
-    axs.yaxis.set_ticks_position('none')
-
-    # Add padding between axes and labels
-    axs.xaxis.set_tick_params(pad=5)
-    axs.yaxis.set_tick_params(pad=10)
-
-    # Add x, y gridlines
-    axs.grid(b=True, color='grey',
-             linestyle='-.', linewidth=0.5,
-             alpha=0.6)
-
-    # Add Text watermark
-    fig.text(0.9, 0.15, 'Proten Function Prediction',
-             fontsize=12,
-             color='red',
-             ha='right',
-             va='bottom',
-             alpha=0.7)
-
-    # Creating histogram
-    N, bins, patches = axs.hist(Optimized_length_seq, bins=n_bins)
-
-    # Setting color
-    fracs = ((N ** (1 / 5)) / N.max())
-    norm = colors.Normalize(fracs.min(), fracs.max())
-
-    for thisfrac, thispatch in zip(fracs, patches):
-        color = plt.cm.viridis(norm(thisfrac))
-        thispatch.set_facecolor(color)
-
-    # Adding extra features
-    plt.xlabel("Sequence Length")
-    plt.ylabel("Number of Sequences")
-    plt.legend(legend)
-    plt.title('Sequence Length Distribution')
-
-    # Show plot
-    plt.show()
-
-
-AnalyticsAndGraph(Sequence)
-# histogram()
+    AnalyticsAndGraph(Sequence)
+    # histogram()
