@@ -13,7 +13,7 @@ Sequence=dataset['sequence_string']
 
 
 
-def AnalyticsAndGraph(Sequence):
+def SequenceAnalytics(Sequence):
 
 
     count_aminos = {}
@@ -45,13 +45,19 @@ def AnalyticsAndGraph(Sequence):
     print('Min length:', np.min(length_seqs))
     print('Max length:', np.max(length_seqs))
 
-def histogram():
+    return length_seqs
+
+def histogram(Sequence):
+
+    length_seqs=SequenceAnalytics(Sequence)
+
+
 
     sorted_seqs = np.array(length_seqs)
     sorted_seqs.sort()
     print('10 shortest:\n{}\n10 longest:\n{}'.format(sorted_seqs[:10], sorted_seqs[-10:]))
 
-    print("Number of Sequences: ", SequenceSize)
+    print("Number of Sequences: ", Sequence.size)
     print('Number sequences less than 30 AA:', len(sorted_seqs[sorted_seqs < 30]))
     print('Number sequences more than 500 AA:', len(sorted_seqs[sorted_seqs > 500]))
     print('Number sequences more than 1000 AA:', len(sorted_seqs[sorted_seqs > 1000]))
@@ -140,5 +146,5 @@ def histogram():
     plt.show()
 
 
-AnalyticsAndGraph(Sequence)
-histogram()
+SequenceAnalytics(Sequence)
+histogram(Sequence)
