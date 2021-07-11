@@ -3,12 +3,13 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 import sqlite3
+from ... import *
 
-con = sqlite3.connect('[DATA]\Enzymes.db')
+con = sqlite3.connect(SQLite_DB_PATH)
 dataset = pd.read_sql_query("SELECT sequence_string FROM Entries", con)
 
 
-Sequence=dataset['sequence_string']
+Sequence = dataset['sequence_string']
 
 
 
@@ -141,4 +142,4 @@ def histogram():
 
 
 AnalyticsAndGraph(Sequence)
-histogram()
+# histogram()

@@ -1,8 +1,7 @@
 import numpy as np
 import pandas as pd
-
-from Modules.EC_Prediction_Modules.EC_First.model_init import *
-from .... import *
+from Modules import *
+from Modules.Model_Spec import model_init
 from Modules.Utility.data_manipulation import map_func
 
 import tensorflow as tf
@@ -26,7 +25,7 @@ def main():
 
     print('eager execution: ', tf.executing_eagerly())
 
-    tokenizer = create_tokenizer("ProtBERT_BFD")
+    tokenizer = model_init.create_tokenizer("ProtBERT_BFD")
 
     Xids = np.zeros((len(dataset), MAX_LEN))
     Xmask = np.zeros((len(dataset), MAX_LEN))
@@ -96,7 +95,7 @@ def main():
     train = tensorflow_dataset.take(round(DS_LEN * SPLIT))
     val = tensorflow_dataset.skip(round(DS_LEN * SPLIT))
 
-    model = create_model(embedding_base="ProtBERT_BFD", categories=categories)
+    model = model_init.create_model(embedding_base="ProtBERT_BFD", categories=categories)
     model.summary()
 
     optimizer = tf.keras.optimizers.Adam(0.01)

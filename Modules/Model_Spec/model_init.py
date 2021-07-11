@@ -1,6 +1,6 @@
 from transformers import AutoTokenizer, TFAutoModel, TFBertModel, XLNetTokenizer, TFXLNetForSequenceClassification
 import tensorflow as tf
-from .... import *
+from ... import *
 
 def create_model(n_dense1=64, n_dense2=16,dout_rate=0.1, ** kwargs):
     embedding_base = kwargs.embedding_base      # specify ProtBERT_BFD or XLNET
@@ -15,7 +15,7 @@ def create_model(n_dense1=64, n_dense2=16,dout_rate=0.1, ** kwargs):
         input_ids = tf.keras.layers.Input(shape=(MAX_LEN,), name='input_ids', dtype='int32')
         mask = tf.keras.layers.Input(shape=(MAX_LEN,), name='attention_mask', dtype='int32')
 
-        embeddings = main_layer(input_ids, attention_mask=mask)
+        embeddings = main_layer(input_ids, attention_mask=mask)[0]
 
     elif embedding_base == "XLNET":     # TODO: probably needs debugging
         base = TFAutoModel.from_pretrained("Rostlab/prot_xlnet", from_pt=True)
@@ -30,6 +30,7 @@ def create_model(n_dense1=64, n_dense2=16,dout_rate=0.1, ** kwargs):
         # throw error
     del base
 
+    # TODO: fix input tensor issue from embedding layers : [0]
     X = tf.keras.layers.GlobalMaxPooling1D()(embeddings)
     X = tf.keras.layers.BatchNormalization()(X)
     X = tf.keras.layers.Dense(n_dense1, activation='relu')(X)
