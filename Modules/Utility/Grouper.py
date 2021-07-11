@@ -1,6 +1,6 @@
 """
 scriptlet to save the autoID's of the entries into text files;
-named second.txt, third.txt and fourth.txt (stored in "EC Groupings" folder), if they have the first
+named second.txt, third.txt and fourth.txt (stored in "EC_Groupings" folder), if they have the first
 two, three or all numbers in EC number notation respectively,
 
 when going to use, read EnzymeAutoID's from the text file. each line is a new entry.
@@ -9,19 +9,20 @@ after reading all into a list, divide into training/validation or just access en
 
 import sqlite3
 import re
+
 SQLite_DB_PATH = r'[DATA]/Enzymes.db'
 
 
 def main():
     con = sqlite3.connect(SQLite_DB_PATH)
     cur1 = con.cursor()
+    cur1.row_factory = lambda cursor, row: row[0]       # get values from row instead of tuple
 
     # cur1.execute("SELECT * FROM Entries")
 
-    cur1.execute("SELECT EnzymeAutoID FROM EntriesReady WHERE ec_number_one=1;")
+    cur1.execute("SELECT EnzymeAutoID FROM EntriesReady WHERE ec_number_one=7;")
 
-    ID_list =list(cur1.fetchall())
-
+    ID_list = list(cur1.fetchall())
     print(len(ID_list))
 
     # while True:
@@ -60,7 +61,7 @@ def main():
     #         # cur2.close()
 
     # save autoID's to appropriate file
-    out_file = open(r"EC Groupings/1.txt", "w+")
+    out_file = open(r'Modules/Utility/EC_Groupings/by_first/7.txt', 'w+')
 
     for ID in ID_list:
         out_file.write(str(ID) + "\n")
