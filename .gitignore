@@ -10,3 +10,9 @@ checkpoints/checkpoint
 *.index
 *.pb
 requirements.txt
+.idea/workspace.xml
+.idea/vcs.xml
+.idea/Protein-Active-Site-w-ML.iml
+.idea/modules.xml
+.idea/misc.xml
+.idea/inspectionProfiles/profiles_settings.xml
