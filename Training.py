@@ -9,12 +9,12 @@ import transformers
 import matplotlib.pyplot as plt
 import re
 
-MAX_LEN = 512
+MAX_LEN = 1024
 BATCH_SIZE = 6 # Possible Values: 4/8/16/32
-DATA_SIZE =500
+DATA_SIZE =200000
 con = sqlite3.connect('[DATA]\Enzymes.db')
 
-dataset = pd.read_sql_query("SELECT ec_number_one, ec_number_two, sequence_string FROM EntriesReady LIMIT ('{0}')".format(DATA_SIZE), con)
+dataset = pd.read_sql_query("SELECT ec_number_one, ec_number_two, sequence_string FROM EntriesReady", con)
 
 #print(dataset)
 
@@ -33,6 +33,13 @@ for i, sequence in enumerate(dataset['sequence_string']):
                                    add_special_tokens=False, return_token_type_ids=False, return_attention_mask=True, return_tensors='tf')
 
     Xids[i, :], Xmask[i, :] = tokens['input_ids'], tokens['attention_mask']
+
+
+
+
+
+plt.pcolormesh(Xmask)
+plt.show()
 
 #print("XIDS")
 #print(Xids[42])
@@ -99,12 +106,12 @@ for i, sequence in enumerate(dataset['sequence_string']):
 
 # # Below code is for off loading the data
 
-# with open('xids.npy','wb') as f:
-#     np.save(f,Xids)
-# with open('xmask.npy','wb') as f:
-#     np.save(f,Xmask)
-# with open('labels.npy','wb') as f:
-#     np.save(f,labels)
+with open('xids.npy','wb') as f:
+    np.save(f,Xids)
+with open('xmask.npy','wb') as f:
+    np.save(f,Xmask)
+with open('labels.npy','wb') as f:
+    np.save(f,labels)
 
 
 # Below code is for load the data
