@@ -49,4 +49,4 @@ print(result)
 
 result=np.argmax(result[0])
 
-print(result)
+print("Your prediction is: ", result+1)
