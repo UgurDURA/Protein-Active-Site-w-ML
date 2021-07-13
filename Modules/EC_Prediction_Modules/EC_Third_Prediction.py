@@ -8,10 +8,10 @@ import os
 import transformers
 import matplotlib.pyplot as plt
 
-MAX_LEN = 256
-BATCH_SIZE = 25 # Possible Values: 4/8/16/32
-DATA_SIZE =10000
-con = sqlite3.connect(r'[DATA]\Enzymes.db')
+MAX_LEN = 512
+BATCH_SIZE = 64 # Possible Values: 4/8/16/32
+DATA_SIZE =80000
+con = sqlite3.connect('[DATA]\Enzymes.db')
 
 dataset = pd.read_sql_query("SELECT ec_number_one, ec_number_two, ec_number_three, sequence_string FROM EntriesReady LIMIT ('{0}')".format(DATA_SIZE), con)
 
@@ -46,7 +46,7 @@ First_EC_List= list(dataset['ec_number_one'])
 Second_EC_List=list(dataset['ec_number_two'])
 Third_EC_List=list(dataset['ec_number_three'])
 
-A=[[First_EC_List],[Second_EC_List]]
+
 
 print(First_EC_List)
 print(Second_EC_List)
@@ -55,7 +55,6 @@ for i in range (len(dataset['ec_number_one'])):
     Accumulated_EC.append((str(First_EC_List[i])+"."+ str(Second_EC_List[i])+"."+str(Third_EC_List[i])))
    
 
-print(Accumulated_EC)
  
 
 from numpy import array
@@ -149,14 +148,14 @@ bert = TFAutoModel.from_pretrained('Rostlab/prot_bert_bfd')
 input_ids = tf.keras.layers.Input(shape=(MAX_LEN,), name='input_ids', dtype='int32')
 mask = tf.keras.layers.Input(shape=(MAX_LEN,), name='attention_mask', dtype='int32')
 
-embeddings = bert(input_ids, attention_mask=mask)[0]
+embeddings = bert.bert(input_ids, attention_mask=mask)[0]
 
 X = tf.keras.layers.GlobalMaxPooling1D()(embeddings)
 X = tf.keras.layers.BatchNormalization()(X)
-X = tf.keras.layers.Dense(128, activation='sigmoid')(X) 
+X = tf.keras.layers.Dense(1024, activation='relu')(X) 
 X = tf.keras.layers.Dropout(0.5)(X)
-X = tf.keras.layers.Dense(64, activation='sigmoid')(X)
-y = tf.keras.layers.Dense((ArraySize), activation='sigmoid', name='outputs')(X)
+X = tf.keras.layers.Dense(512, activation='relu')(X)
+y = tf.keras.layers.Dense((ArraySize), activation='softmax', name='outputs')(X)
 
 model = tf.keras.Model(inputs=[input_ids, mask], outputs=[y])
 
@@ -172,5 +171,27 @@ model.compile(optimizer=optimizer, loss=loss, metrics=[acc])
 history = model.fit(
     train,
     validation_data=val,
-    epochs=15,
+    epochs=10,
 )
+
+model.save("EC_Prediction(Three)")
+print(history)
+
+model.evaulate()
+
+# summarize history for accuracy
+plt.plot(history.history['accuracy'])
+plt.plot(history.history['val_accuracy'])
+plt.title('model accuracy')
+plt.ylabel('accuracy')
+plt.xlabel('epoch')
+plt.legend(['train', 'test'], loc='upper left')
+plt.show()
+# summarize history for loss
+plt.plot(history.history['loss'])
+plt.plot(history.history['val_loss'])
+plt.title('model loss')
+plt.ylabel('loss')
+plt.xlabel('epoch')
+plt.legend(['train', 'test'], loc='upper left')
+plt.show()
