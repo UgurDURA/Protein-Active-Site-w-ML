@@ -3,8 +3,12 @@ scriptlet to divide and preprocess the entries in our database.
 as preprocessing, spaces are added inbetween every token in a sequence : addSpaces();
 additionally, EC numbers are divided into the digits by seperator '.' : ECnumberSeperator
 '''
+import sqlite3
+import re
 
-from ... import *
+# from ... import *
+SQLite_DB_PATH = r'/[DATA]/Enzymes.db'
+
 
 # simple functions to add space between AA sequences, and seperating the EC numbers:
 
@@ -17,19 +21,20 @@ def addSpaces(sequence):
 def ECnumberSeperator(ECnumber):
     '''
     for now, seperates the numbers and returns them.
-    ennumerates N/A numbers into '0', will serve as only first number classification's output encoding.
+    encodes blank numbers into '0', will serve as only first number classification's output encoding.
     '''
 
-    ECnumber = ECnumber.replace("n", "")
-    ECnumber = ECnumber.replace("-", "0")
+    ECnumber = ECnumber.replace('-', '0')
     print('EC Number: ' + ECnumber + '\n')
 
     seperatedECnumber = ECnumber.split('.')
 
-    return seperatedECnumber[0], seperatedECnumber[1], seperatedECnumber[2], seperatedECnumber[3]
+    return seperatedECnumber[0], seperatedECnumber[1], seperatedECnumber[2], '0' if 'n' in seperatedECnumber[3] else seperatedECnumber[3]
+
 
 def map_func(input_ids, masks, labels):
     return {'input_ids': input_ids, 'attention_mask': masks}, labels
+
 
 def main():
 

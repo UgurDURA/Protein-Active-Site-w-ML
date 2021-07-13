@@ -38,7 +38,8 @@ def prepare(Requested_sequence):
 
 test=prepare(Requested_sequence)
 
-model=tf.keras.models.load_model('EC_Prediction')
+model = tf.keras.models.model_from_json('results/config.json')
+model.load_weights('results/tf_model.h5')
 
 model.summary()
 
