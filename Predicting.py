@@ -39,29 +39,29 @@ def prepare(Requested_sequence):
     }
 
 
-con = sqlite3.connect('[DATA]\Enzymes.db')
-cur = con.cursor()
+# con = sqlite3.connect('[DATA]\Enzymes.db')
+# cur = con.cursor()
 
-# LIMIT ('{0}')".format(DATA_SIZE),
-dataset = pd.read_sql_query("SELECT sequence_string, ec_number_one FROM EntriesReady LEFT JOIN Entries WHERE "
-                            "EntriesReady.EnzymeAutoID=Entries.EnzymeAutoID AND Entries.sequence_length >'{0}' LIMIT ('{1}')".format(MAX_LEN,
-                                                                                                                                     DATA_SIZE), con)
+# # LIMIT ('{0}')".format(DATA_SIZE),
+# dataset = pd.read_sql_query("SELECT sequence_string, ec_number_one FROM EntriesReady LEFT JOIN Entries WHERE "
+#                             "EntriesReady.EnzymeAutoID=Entries.EnzymeAutoID AND Entries.sequence_length >'{0}' LIMIT ('{1}')".format(MAX_LEN,
+#                                                                                                                                      DATA_SIZE), con)
 
 
-sequences = []
-ecnums = []
-for e in dataset:
-    sequences.append(prepare(e['sequence_string']))
-    ecnums.append(e['ec_number_one'])
+# sequences = []
+# ecnums = []
+# for e in dataset:
+#     sequences.append(prepare(e['sequence_string']))
+#     ecnums.append(e['ec_number_one'])
 
-labels=np.zeros((ecnums.size, 7))
-labels[np.arange(ecnums.size), ecnums-1] = 1
+# labels=np.zeros((ecnums.size, 7))
+# labels[np.arange(ecnums.size), ecnums-1] = 1
 
 
 model = tf.keras.models.load_model("EC_Prediction")
 # model.load_weights('results/tf_model.h5')
 
-# model.summary()
+model.summary()
 
 # result=model.predict_on_batch()   # to get prediction probability values
 result=model.test_on_batch(sequences, ecnums)      # to get metric score

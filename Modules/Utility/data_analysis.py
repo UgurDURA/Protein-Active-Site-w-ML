@@ -139,6 +139,22 @@ def histogram(Sequence):
 
 
 
-SequenceAnalytics(Sequence)
-histogram(Sequence)
+# SequenceAnalytics(Sequence)
+# histogram(Sequence)
 
+# summarize history for accuracy
+plt.plot([0.6768,0.8166,0.8405,0.8519,0.8574,0.8615,0.8642,0.8708,0.8671,0.8671])
+plt.plot([0.7960,0.8624,0.8776,0.8838,0.8800,0.8846,0.8854,0.8914,0.8934,0.9002])
+plt.title('EC Number two digit model accuracy')
+plt.ylabel('accuracy')
+plt.xlabel('epoch')
+plt.legend(['train', 'test'], loc='upper left')
+plt.show()
+# summarize history for loss
+plt.plot([1.3053,0.7138,0.5984,0.5518,0.5216,0.5008,0.4932,0.4668,0.4725,0.4712])
+plt.plot([0.8083,0.5465,0.4455,0.4343,0.4374,0.4147,0.4019,0.3861,0.3808,0.3612])
+plt.title('model loss')
+plt.ylabel('loss')
+plt.xlabel('epoch')
+plt.legend(['train', 'test'], loc='upper left')
+plt.show()
