@@ -54,6 +54,8 @@ for e in dataset:
     sequences.append(prepare(e['sequence_string']))
     ecnums.append(e['ec_number_one'])
 
+labels=np.zeros((ecnums.size, 7))
+labels[np.arange(ecnums.size), ecnums-1] = 1
 
 
 model = tf.keras.models.load_model("EC_Prediction")
