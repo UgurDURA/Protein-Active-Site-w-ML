@@ -15,7 +15,21 @@ DATA_SIZE =60000
 con = sqlite3.connect('[DATA]\Enzymes.db')
 
 dataset = pd.read_sql_query("SELECT ec_number_one, sequence_string FROM EntriesReady LIMIT ('{0}')".format(DATA_SIZE), con)
+# query for only the first ec num
 
+
+
+"""
+first two:
+dataset = pd.read_sql_query("SELECT ec_number_one, ec_number_two, sequence_string FROM EntriesReady WHERE ec_number_two!=0 LIMIT ('{0}')".format(
+    DATA_SIZE), con)
+
+first three: 
+dataset = pd.read_sql_query("SELECT ec_number_one, ec_number_two, ec_number_three sequence_string FROM EntriesReady WHERE ec_number_two!=0 AND "
+                            "ec_number_three!=0 LIMIT ('{0}')".format(DATA_SIZE), con)
+
+dont forget to adjust the code that one-hot-encodes the ec number
+"""
 #print(dataset)
 
 tokenizer = AutoTokenizer.from_pretrained('Rostlab/prot_bert_bfd', do_lower_case=False, )
