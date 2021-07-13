@@ -35,6 +35,23 @@ def prepare(Requested_sequence):
     }
 
 
+# con = sqlite3.connect('[DATA]\Enzymes.db')
+# cur = con.cursor()
+
+# # LIMIT ('{0}')".format(DATA_SIZE),
+# dataset = pd.read_sql_query("SELECT sequence_string, ec_number_one FROM EntriesReady LEFT JOIN Entries WHERE "
+#                             "EntriesReady.EnzymeAutoID=Entries.EnzymeAutoID AND Entries.sequence_length >'{0}' LIMIT ('{1}')".format(MAX_LEN,
+#                                                                                                                                      DATA_SIZE), con)
+
+
+# sequences = []
+# ecnums = []
+# for e in dataset:
+#     sequences.append(prepare(e['sequence_string']))
+#     ecnums.append(e['ec_number_one'])
+
+# labels=np.zeros((ecnums.size, 7))
+# labels[np.arange(ecnums.size), ecnums-1] = 1
 
 test=prepare(Requested_sequence)
 

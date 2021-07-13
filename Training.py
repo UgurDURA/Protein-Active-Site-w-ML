@@ -37,6 +37,10 @@ for i, sequence in enumerate(dataset['sequence_string']):
 
 
 
+
+plt.pcolormesh(Xmask)
+plt.show()
+
 #print("XIDS")
 #print(Xids[42])
 #print("XMASKS")
@@ -109,12 +113,12 @@ labels[np.arange(arr.size), arr-1] = 1
 
 # # Below code is for off loading the data
 
-# with open('xids.npy','wb') as f:
-#     np.save(f,Xids)
-# with open('xmask.npy','wb') as f:
-#     np.save(f,Xmask)
-# with open('labels.npy','wb') as f:
-#     np.save(f,labels)
+with open('xids.npy','wb') as f:
+    np.save(f,Xids)
+with open('xmask.npy','wb') as f:
+    np.save(f,Xmask)
+with open('labels.npy','wb') as f:
+    np.save(f,labels)
 
 
 # Below code is for load the data
