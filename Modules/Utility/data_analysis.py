@@ -6,7 +6,7 @@ import sqlite3
 from matplotlib import colors
 con = sqlite3.connect('[DATA]\Enzymes.db')
 dataset = pd.read_sql_query("SELECT sequence_string FROM Entries", con)
-import Training
+ 
 
 
 Sequence=dataset['sequence_string']
