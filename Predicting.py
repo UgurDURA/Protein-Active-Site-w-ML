@@ -8,11 +8,12 @@ import os
 import transformers
 import matplotlib.pyplot as plt
 import re
+import sqlite3
 
-print("-----------------------------Welcome to ECOPRO EC Number Prediction-------------------")
 
-Requested_sequence=input('Please request a sequence: ')
-
+# print("-----------------------------Welcome to ECOPRO EC Number Prediction-------------------")
+#
+# Requested_sequence=input('Please request a sequence: ')
 
 
 def prepare(Requested_sequence):
@@ -33,6 +34,15 @@ def prepare(Requested_sequence):
         'input_ids': tf.cast(tokens['input_ids'], tf.float64),
         'attention_mask': tf.cast(tokens['attention_mask'], tf.float64)
     }
+
+con = sqlite3.connect('[DATA]\Enzymes.db')
+cur = con.cursor()
+
+# LIMIT ('{0}')".format(DATA_SIZE),
+dataset = pd.read_sql_query("SELECT sequence_string FROM EntriesReady LEFT JOIN Entries WHERE EntriesReady.EnzymeAutoID=Entries.EnzymeAutoID AND "
+                            "Entries.sequence_length > 512", con)
+
+
 
 
 
