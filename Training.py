@@ -9,13 +9,27 @@ import transformers
 import matplotlib.pyplot as plt
 import re
 
-MAX_LEN = 1024
-BATCH_SIZE = 6 # Possible Values: 4/8/16/32
-DATA_SIZE =200000
+MAX_LEN = 512
+BATCH_SIZE = 64 # Possible Values: 4/8/16/32
+DATA_SIZE =60000
 con = sqlite3.connect('[DATA]\Enzymes.db')
 
-dataset = pd.read_sql_query("SELECT ec_number_one, ec_number_two, sequence_string FROM EntriesReady", con)
+dataset = pd.read_sql_query("SELECT ec_number_one, sequence_string FROM EntriesReady LIMIT ('{0}')".format(DATA_SIZE), con)
+# query for only the first ec num
 
+
+
+"""
+first two:
+dataset = pd.read_sql_query("SELECT ec_number_one, ec_number_two, sequence_string FROM EntriesReady WHERE ec_number_two!=0 LIMIT ('{0}')".format(
+    DATA_SIZE), con)
+
+first three: 
+dataset = pd.read_sql_query("SELECT ec_number_one, ec_number_two, ec_number_three sequence_string FROM EntriesReady WHERE ec_number_two!=0 AND "
+                            "ec_number_three!=0 LIMIT ('{0}')".format(DATA_SIZE), con)
+
+dont forget to adjust the code that one-hot-encodes the ec number
+"""
 #print(dataset)
 
 tokenizer = AutoTokenizer.from_pretrained('Rostlab/prot_bert_bfd', do_lower_case=False, )
@@ -66,43 +80,50 @@ plt.show()
    
 
 
-# from numpy import array
-# from numpy import argmax
-# from sklearn.preprocessing import LabelEncoder
-# from sklearn.preprocessing import OneHotEncoder
-# # define example
-# data =Accumulated_EC
-# values = array(data)
-# #print(values)
-# array=np.unique(values)
-# ArraySize=len(array)
-# # integer encode
-# label_encoder = LabelEncoder()
-# integer_encoded = label_encoder.fit_transform(values)
-# #print(integer_encoded)
-# # binary encode
-# onehot_encoder = OneHotEncoder(sparse=False)
-# integer_encoded = integer_encoded.reshape(len(integer_encoded), 1)
-# onehot_encoded = onehot_encoder.fit_transform(integer_encoded)
-# #print(onehot_encoded)
-# # invert first example
-# inverted = label_encoder.inverse_transform([argmax(onehot_encoded[0, :])])
-# #print(inverted)
+# # from numpy import array
+# # from numpy import argmax
+# # from sklearn.preprocessing import LabelEncoder
+# # from sklearn.preprocessing import OneHotEncoder
+# # # define example
+# # data =Accumulated_EC
+# # values = array(data)
+# # #print(values)
+# # array=np.unique(values)
+# # ArraySize=len(array)
+# # # integer encode
+# # label_encoder = LabelEncoder()
+# # integer_encoded = label_encoder.fit_transform(values)
+# # #print(integer_encoded)
+# # # binary encode
+# # onehot_encoder = OneHotEncoder(sparse=False)
+# # integer_encoded = integer_encoded.reshape(len(integer_encoded), 1)
+# # onehot_encoded = onehot_encoder.fit_transform(integer_encoded)
+# # #print(onehot_encoded)
+# # # invert first example
+# # inverted = label_encoder.inverse_transform([argmax(onehot_encoded[0, :])])
+# # #print(inverted)
 
 
 
 
 
-# labels=onehot_encoded
+# # labels=onehot_encoded
 
-#print("Labels Shape")
-#print(labels.shape)
+# #print("Labels Shape")
+# #print(labels.shape)
 
+arr=dataset['ec_number_one']
+categories = arr.unique().size
 
+labels=np.zeros((arr.size, categories))
+
+labels[np.arange(arr.size), arr-1] = 1
+
+# print(labels)
  
 
-#print("LABELS")
-#print(labels[42])
+# #print("LABELS")
+# #print(labels[42])
 
 # # Below code is for off loading the data
 
@@ -116,26 +137,14 @@ with open('labels.npy','wb') as f:
 
 # Below code is for load the data
 
-# with open(r'C:\Users\ugur_\Desktop\Projects\Protein-Active-Site-w-ML\xids.npy','rb') as fp:
+# with open(r'C:\Users\Emre\Desktop\Project\Protein-Active-Site-w-ML\xids.npy','rb') as fp:
 #     Xids=np.load(fp)
 
-# with open(r'C:\Users\ugur_\Desktop\Projects\Protein-Active-Site-w-ML\xmask.npy','rb') as fp:
+# with open(r'C:\Users\Emre\Desktop\Project\Protein-Active-Site-w-ML\xmask.npy','rb') as fp:
 #     Xmask=np.load(fp)
 
-# with open(r'C:\Users\ugur_\Desktop\Projects\Protein-Active-Site-w-ML\labels.npy','rb') as fp:
+# with open(r'C:\Users\Emre\Desktop\Project\Protein-Active-Site-w-ML\labels.npy','rb') as fp:
 #     labels=np.load(fp)
-
-
-
-arr=dataset['ec_number_one']
-categories = arr.unique().size
-
-labels=np.zeros((arr.size, categories))
-
-labels[np.arange(arr.size), arr-1] = 1
-
-print(labels)
-
 
 
 
@@ -176,7 +185,7 @@ bert = TFAutoModel.from_pretrained('Rostlab/prot_bert_bfd')
 input_ids = tf.keras.layers.Input(shape=(MAX_LEN,), name='input_ids', dtype='int32')
 mask = tf.keras.layers.Input(shape=(MAX_LEN,), name='attention_mask', dtype='int32')
 
-embeddings = bert.bert(input_ids, attention_mask=mask)
+embeddings = bert.bert(input_ids, attention_mask=mask)[0]
 
 X = tf.keras.layers.GlobalMaxPooling1D()(embeddings)
 X = tf.keras.layers.BatchNormalization()(X)
@@ -201,11 +210,11 @@ model.compile(optimizer=optimizer, loss=loss, metrics=[acc])
 history = model.fit(
     train,
     validation_data=val,
-    epochs=5,
+    epochs=16,
 )
 
 model.save("EC_Prediction")
-#print(history)
+print(history)
 
 # summarize history for accuracy
 plt.plot(history.history['accuracy'])
