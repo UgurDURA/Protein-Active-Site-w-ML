@@ -6,6 +6,9 @@ additionally, EC numbers are divided into the digits by seperator '.' : ECnumber
 import sqlite3
 from Modules.Model_Spec import defaults
 
+import re
+
+
 # simple functions to add space between AA sequences, and seperating the EC numbers:
 
 def addSpaces(sequence):
@@ -17,19 +20,20 @@ def addSpaces(sequence):
 def ECnumberSeperator(ECnumber):
     '''
     for now, seperates the numbers and returns them.
-    ennumerates N/A numbers into '0', will serve as only first number classification's output encoding.
+    encodes blank numbers into '0', will serve as only first number classification's output encoding.
     '''
 
-    ECnumber = ECnumber.replace("n", "")
-    ECnumber = ECnumber.replace("-", "0")
+    ECnumber = ECnumber.replace('-', '0')
     print('EC Number: ' + ECnumber + '\n')
 
     seperatedECnumber = ECnumber.split('.')
 
-    return seperatedECnumber[0], seperatedECnumber[1], seperatedECnumber[2], seperatedECnumber[3]
+    return seperatedECnumber[0], seperatedECnumber[1], seperatedECnumber[2], '0' if 'n' in seperatedECnumber[3] else seperatedECnumber[3]
+
 
 def map_func(input_ids, masks, labels):
     return {'input_ids': input_ids, 'attention_mask': masks}, labels
+
 
 def main():
 
