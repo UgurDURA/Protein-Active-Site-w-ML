@@ -9,7 +9,7 @@ import transformers
 import matplotlib.pyplot as plt
 import re
 
-print("-----------------------------Welcome to ECOPRO EC Number Prediction-------------------")
+print("-----------------------------Welcome to SUNY EC Number Prediction-------------------")
 
 Requested_sequence=input('Please request a sequence: ')
 

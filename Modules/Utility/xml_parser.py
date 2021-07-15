@@ -1,6 +1,6 @@
 import os
 import xml.etree.ElementTree as ET
-from ... import *
+from Modules.Model_Spec import defaults
 
 import sqlite3
 

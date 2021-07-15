@@ -10,6 +10,8 @@ after reading all into a list, divide into training/validation or just access en
 import sqlite3
 import re
 
+from Modules.Model_Spec import defaults
+
 SQLite_DB_PATH = r'[DATA]/Enzymes.db'
 
 

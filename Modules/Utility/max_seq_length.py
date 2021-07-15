@@ -1,6 +1,6 @@
 import os
 import xml.etree.ElementTree as ET
-from ... import *
+from Modules.Model_Spec import defaults
 
 def process_entry(entry, ns):
     try:
