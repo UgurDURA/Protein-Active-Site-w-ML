@@ -4,10 +4,9 @@ as preprocessing, spaces are added inbetween every token in a sequence : addSpac
 additionally, EC numbers are divided into the digits by seperator '.' : ECnumberSeperator
 '''
 import sqlite3
-import re
+from Modules.Model_Spec import defaults
 
-# from ... import *
-SQLite_DB_PATH = r'/[DATA]/Enzymes.db'
+import re
 
 
 # simple functions to add space between AA sequences, and seperating the EC numbers:
@@ -38,7 +37,7 @@ def map_func(input_ids, masks, labels):
 
 def main():
 
-    con = sqlite3.connect(SQLite_DB_PATH)
+    con = sqlite3.connect(defaults.SQLite_DB_PATH)
     cur1 = con.cursor()
     cur2 = con.cursor()
 
