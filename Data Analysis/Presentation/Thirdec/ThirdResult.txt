@@ -203,7 +203,7 @@ If your task is similar to the task the model of the checkpoint was trained on, 
 WARNING:tensorflow:From C:\Users\Emre\.conda\envs\TensorFlow\lib\site-packages\tensorflow\python\ops\array_ops.py:5043: calling gather (from tensorflow.python.ops.array_ops) with validate_indices is deprecated and will be removed in a future version.
 Instructions for updating:
 The `validate_indices` argument has no effect. Indices are always validated on CPU and never validated on GPU.
-Model: "model"
+Model: "Third EC"
 __________________________________________________________________________________________________
 Layer (type)                    Output Shape         Param #     Connected to
 
