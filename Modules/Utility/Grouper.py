@@ -9,7 +9,7 @@ after reading all into a list, divide into training/validation or just access en
 
 import sqlite3
 import re
-from ... import *
+from Modules.Model_Spec import defaults
 
 
 def main():
