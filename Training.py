@@ -1,11 +1,8 @@
-from enum import unique
 import numpy as np
 import pandas as pd
 from transformers import AutoTokenizer, TFAutoModel
 import tensorflow as tf
 import sqlite3
-import os
-import transformers
 import matplotlib.pyplot as plt
 import re
 
@@ -16,7 +13,6 @@ con = sqlite3.connect('[DATA]\Enzymes.db')
 
 dataset = pd.read_sql_query("SELECT ec_number_one, sequence_string FROM EntriesReady LIMIT ('{0}')".format(DATA_SIZE), con)
 
-#print(dataset)
 
 tokenizer = AutoTokenizer.from_pretrained('Rostlab/prot_bert_bfd', do_lower_case=False, )
 
@@ -35,81 +31,18 @@ for i, sequence in enumerate(dataset['sequence_string']):
     Xids[i, :], Xmask[i, :] = tokens['input_ids'], tokens['attention_mask']
 
 
-
-
-
 plt.pcolormesh(Xmask)
 plt.show()
 
-#print("XIDS")
-#print(Xids[42])
-#print("XMASKS")
-#print(Xmask[42])
-
-
-# plt.plot(Xids[42])
-
-# plt.show()
-
-# Accumulated_EC=[]
-
-
-
-
-# First_EC_List= list(dataset['ec_number_one'])
-# Second_EC_List=list(dataset['ec_number_two'])
-
-# A=[[First_EC_List],[Second_EC_List]]
-
-# for i in range (len(dataset['ec_number_one'])):
-#     Accumulated_EC.append((str(First_EC_List[i])+"."+ str(Second_EC_List[i])))
-   
-
-
-# # from numpy import array
-# # from numpy import argmax
-# # from sklearn.preprocessing import LabelEncoder
-# # from sklearn.preprocessing import OneHotEncoder
-# # # define example
-# # data =Accumulated_EC
-# # values = array(data)
-# # #print(values)
-# # array=np.unique(values)
-# # ArraySize=len(array)
-# # # integer encode
-# # label_encoder = LabelEncoder()
-# # integer_encoded = label_encoder.fit_transform(values)
-# # #print(integer_encoded)
-# # # binary encode
-# # onehot_encoder = OneHotEncoder(sparse=False)
-# # integer_encoded = integer_encoded.reshape(len(integer_encoded), 1)
-# # onehot_encoded = onehot_encoder.fit_transform(integer_encoded)
-# # #print(onehot_encoded)
-# # # invert first example
-# # inverted = label_encoder.inverse_transform([argmax(onehot_encoded[0, :])])
-# # #print(inverted)
-
-
-
-
-
-# # labels=onehot_encoded
 
 # #print("Labels Shape")
 # #print(labels.shape)
 
 arr=dataset['ec_number_one']
 categories = arr.unique().size
-
 labels=np.zeros((arr.size, categories))
-
 labels[np.arange(arr.size), arr-1] = 1
 
-# print(labels)
- 
-
-# #print("LABELS")
-# #print(labels[42])
 
 # # Below code is for off loading the data
 
@@ -139,10 +72,6 @@ with open('labels.npy','wb') as f:
 
 tensorflow_dataset = tf.data.Dataset.from_tensor_slices((Xids, Xmask, labels))
 
-#print("DATASET ON TENSOR FLOW EXAMPLE")
-
-for i in tensorflow_dataset.take(1):
-    print(i)
 
 def map_func(input_ids, masks, labels):
     return {'input_ids': input_ids, 'attention_mask': masks}, labels
@@ -163,7 +92,6 @@ SPLIT = .9
 
 train = tensorflow_dataset.take(round(DS_LEN * SPLIT))
 val = tensorflow_dataset.skip(round(DS_LEN * SPLIT))
-
 
 
 bert = TFAutoModel.from_pretrained('Rostlab/prot_bert_bfd')
@@ -190,7 +118,6 @@ loss = tf.keras.losses.CategoricalCrossentropy()
 acc = tf.keras.metrics.CategoricalAccuracy('accuracy')
 
 model.compile(optimizer=optimizer, loss=loss, metrics=[acc])
-
 
 
 history = model.fit(
