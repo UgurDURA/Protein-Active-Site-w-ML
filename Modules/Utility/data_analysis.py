@@ -3,8 +3,12 @@ import numpy as np
 import matplotlib.pyplot as plt
 import pandas as pd
 import sqlite3
+
+from Modules.Model_Spec import defaults
+
+con = sqlite3.connect(defaults.SQLite_DB_PATH)
 from matplotlib import colors
-con = sqlite3.connect('[DATA]\Enzymes.db')
+
 dataset = pd.read_sql_query("SELECT sequence_string FROM Entries", con)
  
 

@@ -8,12 +8,17 @@ import os
 import transformers
 import matplotlib.pyplot as plt
 import re
+import sqlite3
 
-print("-----------------------------Welcome to ECOPRO EC Number Prediction-------------------")
+MAX_LEN = 512
+DATA_SIZE = 1
 
-Requested_sequence=input('Please request a sequence: ')
 
+ 
 
+model = tf.keras.models.load_model("EC_Prediction")
+
+model.summary()
 
 def prepare(Requested_sequence):
 
@@ -26,7 +31,7 @@ def prepare(Requested_sequence):
 
     Requested_sequence=re.sub(r"[UZOB]", "X",  Requested_sequence)
     tokens = tokenizer(Requested_sequence, max_length=512, truncation=True, padding="max_length",
-                                   add_special_tokens=True, return_token_type_ids=False, return_attention_mask=True, return_tensors='tf')
+                                   add_special_tokens=False, return_token_type_ids=False, return_attention_mask=True, return_tensors='tf')
 
 
     return {
@@ -35,35 +40,49 @@ def prepare(Requested_sequence):
     }
 
 
-# con = sqlite3.connect('[DATA]\Enzymes.db')
-# cur = con.cursor()
+con = sqlite3.connect('[DATA]\Enzymes.db')
+cur = con.cursor()
 
-# # LIMIT ('{0}')".format(DATA_SIZE),
-# dataset = pd.read_sql_query("SELECT sequence_string, ec_number_one FROM EntriesReady LEFT JOIN Entries WHERE "
-#                             "EntriesReady.EnzymeAutoID=Entries.EnzymeAutoID AND Entries.sequence_length >'{0}' LIMIT ('{1}')".format(MAX_LEN,
-#                                                                                                                                      DATA_SIZE), con)
+# LIMIT ('{0}')".format(DATA_SIZE),
+dataset = pd.read_sql_query("SELECT sequence_string, ec_number_one FROM EntriesReady LEFT JOIN Entries WHERE "
+                            "EntriesReady.EnzymeAutoID=Entries.EnzymeAutoID AND Entries.sequence_length >'{0}' LIMIT ('{1}')".format(MAX_LEN,
+                                                                                                                                     DATA_SIZE), con)
 
 
-# sequences = []
-# ecnums = []
-# for e in dataset:
-#     sequences.append(prepare(e['sequence_string']))
-#     ecnums.append(e['ec_number_one'])
 
-# labels=np.zeros((ecnums.size, 7))
-# labels[np.arange(ecnums.size), ecnums-1] = 1
 
-test=prepare(Requested_sequence)
+sequences = []
+ecnums = []
+for e in dataset:
+    sequences.append(prepare(e['sequence_string']))
+    ecnums.append(e['ec_number_one'])
 
-model = tf.keras.models.load_model("EC_Prediction")
-# model.load_weights('results/tf_model.h5')
+labels=np.zeros((ecnums.size, 7))
+labels[np.arange(ecnums.size), ecnums-1] = 1
 
-model.summary()
 
-result=model.predict(test)
+ 
+while True:
 
-print(result)
+    print("-----------------------------Welcome to SUNY EC Number Prediction-------------------")
+    print('-------Please Press 1 to Enter a sequence to predict its EC or Press 0 to exit')
+    UserInput=input("Please press 1 or 0 ")
+    if UserInput==1:
 
-result=np.argmax(result[0])
+        Requested_sequence=input('Please request a sequence: ')
+        result=model.predict_on_batch()   # to get prediction probability values
+        result=model.test_on_batch(sequences, ecnums)      # to get metric score
+        # result=np.argmax(result[0])
+        print(result)
+    else:
+        break
 
-print("Your prediction is: ", result+1)
+    
+
+
+
+
+
+
+
+
