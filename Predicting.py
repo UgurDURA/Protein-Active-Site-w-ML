@@ -11,10 +11,10 @@ import re
 import sqlite3
 
 MAX_LEN = 512
-DATA_SIZE = 50
+DATA_SIZE = 1
 
 
-print("-----------------------------Welcome to ECOPRO EC Number Prediction-------------------")
+ 
 
 model = tf.keras.models.load_model("EC_Prediction")
 
@@ -49,6 +49,8 @@ dataset = pd.read_sql_query("SELECT sequence_string, ec_number_one FROM EntriesR
                                                                                                                                      DATA_SIZE), con)
 
 
+
+
 sequences = []
 ecnums = []
 for e in dataset:
@@ -59,14 +61,23 @@ labels=np.zeros((ecnums.size, 7))
 labels[np.arange(ecnums.size), ecnums-1] = 1
 
 
-
+ 
 while True:
 
-    Requested_sequence=input('Please request a sequence: ')
-    result=model.predict_on_batch()   # to get prediction probability values
-    result=model.test_on_batch(sequences, ecnums)      # to get metric score
-    # result=np.argmax(result[0])
-    print(result)
+    print("-----------------------------Welcome to SUNY EC Number Prediction-------------------")
+    print('-------Please Press 1 to Enter a sequence to predict its EC or Press 0 to exit')
+    UserInput=input("Please press 1 or 0 ")
+    if UserInput==1:
+
+        Requested_sequence=input('Please request a sequence: ')
+        result=model.predict_on_batch()   # to get prediction probability values
+        result=model.test_on_batch(sequences, ecnums)      # to get metric score
+        # result=np.argmax(result[0])
+        print(result)
+    else:
+        break
+
+    
 
 
 
