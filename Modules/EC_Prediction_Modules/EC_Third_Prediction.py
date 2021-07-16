@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 
 MAX_LEN = 512
 BATCH_SIZE = 64 # Possible Values: 4/8/16/32
-DATA_SIZE =10000
+DATA_SIZE =100000
 con = sqlite3.connect('[DATA]\Enzymes.db')
 
 dataset = pd.read_sql_query("SELECT ec_number_one, ec_number_two, ec_number_three, sequence_string FROM EntriesReady LIMIT ('{0}')".format(DATA_SIZE), con)
@@ -154,7 +154,7 @@ X = tf.keras.layers.GlobalMaxPooling1D()(embeddings)
 X = tf.keras.layers.BatchNormalization()(X)
 X = tf.keras.layers.Dense(1024, activation='sigmoid')(X) 
 X = tf.keras.layers.Dropout(0.1)(X)
-X = tf.keras.layers.Dense(256, activation='sigmoid')(X)
+X = tf.keras.layers.Dense(512, activation='sigmoid')(X)
 y = tf.keras.layers.Dense((ArraySize), activation='sigmoid', name='outputs')(X)
 
 model = tf.keras.Model(inputs=[input_ids, mask], outputs=[y])
@@ -171,10 +171,10 @@ model.compile(optimizer=optimizer, loss=loss, metrics=[acc])
 history = model.fit(
     train,
     validation_data=val,
-    epochs=10,
+    epochs=9,
 )
 
-model.save("EC_Prediction(Three)")
+model.save("EC_Prediction(Three-Sigmoid)")
 print(history)
 
 
